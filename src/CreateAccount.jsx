@@ -1,0 +1,78 @@
+import { Box, Stack, TextField } from "@mui/material"
+import Button from '@mui/material/Button';
+import { useState } from "react";
+
+function CreateAccount() {
+    // text fields' state
+    const [firstName, setFirstName] = useState('');
+    const [lastName, setLastName] = useState('');
+    const [password, setPassword] = useState('');
+
+    // for empty field validation
+    const [firstNameEmpty, setFirstNameEmpty] = useState(false);
+    const [lastNameEmpty, setLastNameEmpty] = useState(false);
+    const [passwordEmpty, setPasswordEmpty] = useState(false);
+
+    const fieldIsEmpty = 'Please do not leave blank!';
+     
+    const handleFirstName = (event) => {
+        setFirstName(event.target.value);
+    }
+
+    const handleLastName = (event) => {
+        setLastName(event.target.value);
+    }
+
+    const handlePassword = (event) => {
+        setPassword(event.target.value);
+    }
+    
+    const handleCreateClick = () => {
+        // when the 'Create' button is clicked
+        console.log(`first name: ${firstName}`);
+        console.log(`last name: ${lastName}`);
+        console.log(`password: ${password}`);
+
+        // client-side field validation
+        if (firstName === '') {
+            setFirstNameEmpty(true);
+        } else {
+            setFirstNameEmpty(false);
+        }
+        if (lastName === '') {
+            setLastNameEmpty(true);
+        } else {
+            setLastNameEmpty(false);
+        }
+        if (password === '') {
+            setPasswordEmpty(true);
+        } else {
+            setPasswordEmpty(false);
+        }
+    }
+
+    return <>
+        <Box sx={{
+            display: 'flex',
+            justifyContent: 'center',
+            transform: "translate(0%, 50%)", // Center it perfectly
+            // border: '1px solid black'
+        }}>
+            <Stack direction='column' spacing={2} sx={{width: '500px'}}>
+                <h2>Create Account</h2>
+                <TextField id="create-firstname" label='First Name' variant="outlined" error={firstNameEmpty} 
+                    helperText={firstNameEmpty ? fieldIsEmpty : null} value={firstName} onChange={handleFirstName}/>
+
+                <TextField id="create-lastname" label='Last Name' variant="outlined" error={lastNameEmpty} 
+                    helperText={lastNameEmpty ? fieldIsEmpty : null} value={lastName} onChange={handleLastName}/>
+
+                <TextField id="create-password" label='Password' variant="outlined" type="password" error={passwordEmpty}
+                    helperText={passwordEmpty ? fieldIsEmpty : null} value={password} onChange={handlePassword}/>
+
+                <Button variant="contained" sx={{height:'50px'}} disableElevation onClick={handleCreateClick}>Create</Button>
+            </Stack>
+        </Box>
+    </>
+}
+
+export default CreateAccount
