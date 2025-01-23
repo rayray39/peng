@@ -56,6 +56,7 @@ function CreateAccount() {
             // border: '1px solid black'
         }}>
             <Stack direction='column' spacing={2} sx={{width: '500px'}}>
+                <h2>Create Account</h2>
                 <TextField id="create-firstname" label='First Name' variant="outlined" error={firstNameEmpty} 
                     helperText={firstNameEmpty ? fieldIsEmpty : null} value={firstName} onChange={handleFirstName}/>
 
