@@ -3,10 +3,12 @@ import Button from '@mui/material/Button';
 import { useState } from "react";
 
 function CreateAccount() {
+    // text fields' state
     const [firstName, setFirstName] = useState('');
     const [lastName, setLastName] = useState('');
     const [password, setPassword] = useState('');
 
+    // for empty field validation
     const [firstNameEmpty, setFirstNameEmpty] = useState(false);
     const [lastNameEmpty, setLastNameEmpty] = useState(false);
     const [passwordEmpty, setPasswordEmpty] = useState(false);
@@ -26,6 +28,7 @@ function CreateAccount() {
     }
     
     const handleCreateClick = () => {
+        // when the 'Create' button is clicked
         console.log(`first name: ${firstName}`);
         console.log(`last name: ${lastName}`);
         console.log(`password: ${password}`);
