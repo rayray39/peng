@@ -1,14 +1,11 @@
-import { useState } from 'react'
 import './App.css'
-import CreateAccount from './CreateAccount'
+import WelcomePage from './WelcomePage';
 
 function App() {
 
-  return (
-    <>
-      <CreateAccount />
-    </>
-  )
+    return (
+        <WelcomePage />
+    );
 }
 
 export default App
