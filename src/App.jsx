@@ -1,10 +1,13 @@
+import { Box } from '@mui/material';
 import './App.css'
 import WelcomePage from './WelcomePage';
 
 function App() {
 
     return (
-        <WelcomePage />
+        <Box>
+            <WelcomePage />
+        </Box>
     );
 }
 

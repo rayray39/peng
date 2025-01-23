@@ -1,7 +1,5 @@
 import { SignedIn, SignedOut, SignInButton, UserButton } from "@clerk/clerk-react";
 import { Box, Stack } from "@mui/material";
-import Button from '@mui/material/Button';
-
 
 function ClerkSignInButton() {
     // uses clerk's components for sign in and sign up
@@ -9,11 +7,15 @@ function ClerkSignInButton() {
         <div>
             <SignedOut>
                 <SignInButton>
-                    <Button sx={{
-                            height:'50px', width:'200px', backgroundColor:'orange'
-                        }}
-                        variant="contained" disableElevation>Sign In
-                    </Button>
+                    <button style={{
+                        width:'200px',
+                        height:'40px',
+                        backgroundColor:'orange',
+                        border:'none',
+                        borderRadius:'4px',
+                        color:'white',
+                        fontSize:'16px',
+                    }}>Sign In</button>
                 </SignInButton>
             </SignedOut>
             <SignedIn>
