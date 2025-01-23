@@ -7,6 +7,12 @@ function CreateAccount() {
     const [lastName, setLastName] = useState('');
     const [password, setPassword] = useState('');
 
+    const [firstNameEmpty, setFirstNameEmpty] = useState(false);
+    const [lastNameEmpty, setLastNameEmpty] = useState(false);
+    const [passwordEmpty, setPasswordEmpty] = useState(false);
+
+    const fieldIsEmpty = 'Please do not leave blank!';
+     
     const handleFirstName = (event) => {
         setFirstName(event.target.value);
     }
@@ -23,6 +29,23 @@ function CreateAccount() {
         console.log(`first name: ${firstName}`);
         console.log(`last name: ${lastName}`);
         console.log(`password: ${password}`);
+
+        // client-side field validation
+        if (firstName === '') {
+            setFirstNameEmpty(true);
+        } else {
+            setFirstNameEmpty(false);
+        }
+        if (lastName === '') {
+            setLastNameEmpty(true);
+        } else {
+            setLastNameEmpty(false);
+        }
+        if (password === '') {
+            setPasswordEmpty(true);
+        } else {
+            setPasswordEmpty(false);
+        }
     }
 
     return <>
@@ -33,9 +56,14 @@ function CreateAccount() {
             // border: '1px solid black'
         }}>
             <Stack direction='column' spacing={2} sx={{width: '500px'}}>
-                <TextField id="create-firstname" label='First Name' variant="outlined" value={firstName} onChange={handleFirstName}/>
-                <TextField id="create-lastname" label='Last Name' variant="outlined" value={lastName} onChange={handleLastName}/>
-                <TextField id="create-password" label='Password' variant="outlined" type="password" value={password} onChange={handlePassword}/>
+                <TextField id="create-firstname" label='First Name' variant="outlined" error={firstNameEmpty} 
+                    helperText={firstNameEmpty ? fieldIsEmpty : null} value={firstName} onChange={handleFirstName}/>
+
+                <TextField id="create-lastname" label='Last Name' variant="outlined" error={lastNameEmpty} 
+                    helperText={lastNameEmpty ? fieldIsEmpty : null} value={lastName} onChange={handleLastName}/>
+
+                <TextField id="create-password" label='Password' variant="outlined" type="password" error={passwordEmpty}
+                    helperText={passwordEmpty ? fieldIsEmpty : null} value={password} onChange={handlePassword}/>
 
                 <Button variant="contained" sx={{height:'50px'}} disableElevation onClick={handleCreateClick}>Create</Button>
             </Stack>
