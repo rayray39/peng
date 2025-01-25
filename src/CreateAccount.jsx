@@ -59,7 +59,7 @@ function CreateAccount() {
         <Box sx={{
             display: 'flex',
             justifyContent: 'center',
-            transform: "translate(0%, 40%)", // Center it perfectly
+            transform: "translate(0%, 30%)", // Center it perfectly
             // border: '1px solid black'
         }}>
             <Stack direction='column' spacing={2} sx={{width: '500px'}}>
@@ -70,12 +70,12 @@ function CreateAccount() {
                 <TextField id="create-lastname" label='Last Name' variant="outlined" error={lastNameEmpty} 
                     helperText={lastNameEmpty ? fieldIsEmpty : null} value={lastName} onChange={handleLastName}/>
 
-                <TextField id="create-username" label='Username' variant="outlined"/>
+                <TextField id="create-username" label='Username' variant="outlined" helperText='Set a  username for future log ins.'/>
 
                 <TextField id="create-password" label='Password' variant="outlined" type="password" error={passwordEmpty}
                     helperText={passwordEmpty ? fieldIsEmpty : null} value={password} onChange={handlePassword}/>
 
-                <Button variant="contained" sx={{height:'50px'}} disableElevation onClick={handleCreateClick}>Create</Button>
+                <Button variant="contained" sx={{height:'50px', backgroundColor:'orange'}} disableElevation onClick={handleCreateClick}>Create</Button>
             </Stack>
         </Box>
     </>
