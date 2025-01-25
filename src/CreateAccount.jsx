@@ -1,4 +1,5 @@
-import { Box, Stack, TextField } from "@mui/material"
+import { Box, Stack, TextField, Link } from "@mui/material"
+import { Link as RouterLink } from 'react-router-dom';
 import Button from '@mui/material/Button';
 import { useState } from "react";
 
@@ -89,6 +90,11 @@ function CreateAccount() {
                     helperText={passwordEmpty ? fieldIsEmpty : null} value={password} onChange={handlePassword}/>
 
                 <Button variant="contained" sx={{height:'50px', backgroundColor:'orange'}} disableElevation onClick={handleCreateClick}>Create</Button>
+
+                {/* link to CreateAccount */}
+                <Link component={RouterLink} to='/' underline="hover">
+                    {"Already have an account? Log In"}
+                </Link>
             </Stack>
         </Box>
     </>
