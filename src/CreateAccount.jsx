@@ -17,7 +17,11 @@ function CreateAccount() {
     const [usernameEmpty, setUsernameEmpty] = useState(false);
     const [passwordEmpty, setPasswordEmpty] = useState(false);
 
+    // for username already taken validation
+    const [usernameAlreadyTaken, setUsernameAlreadyTaken] = useState(false);
+
     const fieldIsEmpty = 'Please do not leave blank!';
+    const usernameIsTaken = 'Username is already taken!';
      
     const handleFirstName = (event) => {
         setFirstName(event.target.value);
@@ -84,6 +88,11 @@ function CreateAccount() {
         const data = await response.json();
         if (!response.ok) {
             console.log(data.error);
+            if (response.status === 400) {
+                setUsernameAlreadyTaken(true);
+            } else {
+                setUsernameAlreadyTaken(false);
+            }
             return;
         }
 
@@ -104,8 +113,9 @@ function CreateAccount() {
                 <TextField id="create-lastname" label='Last Name' variant="outlined" error={lastNameEmpty} 
                     helperText={lastNameEmpty ? fieldIsEmpty : null} value={lastName} onChange={handleLastName}/>
 
-                <TextField id="create-username" label='Username' variant="outlined" error={usernameEmpty}
-                    helperText={usernameEmpty ? fieldIsEmpty : 'Set a username for future logins.'} value={username} onChange={handleUsername}/>
+                <TextField id="create-username" label='Username' variant="outlined" error={usernameEmpty || usernameAlreadyTaken}
+                    helperText={usernameEmpty ? fieldIsEmpty : (usernameAlreadyTaken ? usernameIsTaken : 'Set a username for future logins.')}
+                    value={username} onChange={handleUsername}/>
 
                 <TextField id="create-password" label='Password' variant="outlined" type="password" error={passwordEmpty}
                     helperText={passwordEmpty ? fieldIsEmpty : null} value={password} onChange={handlePassword}/>
