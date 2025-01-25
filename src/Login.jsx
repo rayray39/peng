@@ -7,7 +7,7 @@ import { useUser } from "./UserContext";
 function Login() {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
-    const { login } = useUser();
+    const { login, currentUser } = useUser();
 
     // for empty field validation
     const [usernameEmpty, setUsernameEmpty] = useState(false);
@@ -23,7 +23,7 @@ function Login() {
         setPassword(event.target.value);
     }
 
-    const handleCreateClick = () => {
+    const handleCreateClick = async () => {
         // when the 'Create' button is clicked
         if (username && password) {
             console.log(`username: ${username}`);
@@ -48,7 +48,8 @@ function Login() {
     }
 
     const logUserIn = async (username, password) => {
-        const response = await fetch('http://localhost:5000/log-user-in', {
+        // post the user credentials, verify them and log the user in if corrent
+        const response = await fetch("http://localhost:5000/log-user-in", {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -63,7 +64,11 @@ function Login() {
         }
 
         console.log(data.message);
-        login(data.user);
+        login(data.user);   // use function in context to set current user
+    }
+
+    const getCurrentUser = () => {
+        console.log(`current user: ${currentUser.username}`);
     }
 
     return <Box sx={{
@@ -82,6 +87,8 @@ function Login() {
 
             <Button variant="contained" sx={{height:'50px', backgroundColor:'orange'}} disableElevation 
                 onClick={handleCreateClick} >Log In</Button>
+
+            <button onClick={getCurrentUser}>get current user</button>
 
             {/* link to CreateAccount */}
             <Link component={RouterLink} to='/create-account' underline="hover">

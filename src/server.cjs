@@ -69,6 +69,7 @@ app.post("/create-new-account", (req, res) => {
     });
 });
 
+// retrieves user credentials from client-side, verfiy them, returns back the logged in user
 app.post("/log-user-in", (req, res) => {
     const { username, password } = req.body;
 
