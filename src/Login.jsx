@@ -13,7 +13,10 @@ function Login() {
     const [usernameEmpty, setUsernameEmpty] = useState(false);
     const [passwordEmpty, setPasswordEmpty] = useState(false);
 
+    const [passwordIncorrect, setPasswordIncorrect] = useState(false);
+
     const fieldIsEmpty = 'Please do not leave blank!';
+    const passwordIsIncorect = 'Password is incorrect!';
 
     const handleUsername = (event) => {
         setUsername(event.target.value);
@@ -59,11 +62,17 @@ function Login() {
 
         const data = await response.json();
         if (!response.ok) {
+            if (response.status === 403) {
+                setPasswordIncorrect(true);
+            } else {
+                setPasswordIncorrect(false);
+            }
             console.log(data.error);
             return;
         }
 
         console.log(data.message);
+        setPasswordIncorrect(false);
         login(data.user);   // use function in context to set current user
     }
 
@@ -83,7 +92,8 @@ function Login() {
                 value={username} onChange={handleUsername} error={usernameEmpty} helperText={usernameEmpty ? fieldIsEmpty : null}/>
 
             <TextField id="login-password" label='Password' variant="outlined" type="password"
-                value={password} onChange={handlePassword} error={passwordEmpty} helperText={passwordEmpty ? fieldIsEmpty : null}/>
+                value={password} onChange={handlePassword} error={passwordEmpty || passwordIncorrect}
+                helperText={passwordEmpty ? fieldIsEmpty : (passwordIncorrect ? passwordIsIncorect : null) }/>
 
             <Button variant="contained" sx={{height:'50px', backgroundColor:'orange'}} disableElevation 
                 onClick={handleCreateClick} >Log In</Button>
