@@ -15,7 +15,7 @@ function Login() {
 
             <TextField id="login-password" label='Password' variant="outlined" type="password"/>
 
-            <Button variant="contained" sx={{height:'50px'}} disableElevation >Log In</Button>
+            <Button variant="contained" sx={{height:'50px', backgroundColor:'orange'}} disableElevation >Log In</Button>
         </Stack>
     </Box>
 }
