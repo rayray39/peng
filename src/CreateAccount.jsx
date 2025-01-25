@@ -72,7 +72,7 @@ function CreateAccount() {
         <Box sx={{
             display: 'flex',
             justifyContent: 'center',
-            transform: "translate(0%, 30%)", // Center it perfectly
+            transform: "translate(0%, 20%)", // Center it perfectly
         }}>
             <Stack direction='column' spacing={2} sx={{width: '500px'}}>
                 <h2>Create Your Account</h2>
