@@ -69,6 +69,41 @@ app.post("/create-new-account", (req, res) => {
     });
 });
 
+app.post("/log-user-in", (req, res) => {
+    const { username, password } = req.body;
+
+    if (!username || !password) {
+        return res.status(403).json({ error: 'Username or Password missing.' });
+    }
+
+    // validate user identity
+    const query = `SELECT id, username, password FROM users WHERE username = ?`;
+
+    db.get(query, [username], (err, row) => {
+        if (err) {
+            console.error('Error querying database:', err);
+            return res.status(500).json({ error: 'Database error.' });
+        }
+
+        if (!row) {
+            return res.status(404).json({ error: 'User not found.' });
+        }
+
+        if (row.password !== password) {
+            return res.status(403).json({ error: 'Incorrect Password.' });
+        }
+
+        // Respond with user data, excluding sensitive fields
+        res.status(200).json({
+            message: 'Successfully logged in.',
+            user: {
+                id: row.id,
+                username: row.username
+            }
+        });
+    });
+})
+
 // returns all users in the database
 app.get('/all-users', (req, res) => {
     const query = "SELECT * FROM users";
