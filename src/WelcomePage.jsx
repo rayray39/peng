@@ -1,6 +1,7 @@
 import { Button, Box, Stack } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 
+// main entry of site - user welcome page
 function WelcomePage() {
     const navigate = useNavigate();
 

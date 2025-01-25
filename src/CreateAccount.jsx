@@ -3,6 +3,7 @@ import { Link as RouterLink } from 'react-router-dom';
 import Button from '@mui/material/Button';
 import { useState } from "react";
 
+// create user account page - user sign up page
 function CreateAccount() {
     // text fields' state
     const [firstName, setFirstName] = useState('');
