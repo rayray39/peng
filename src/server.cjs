@@ -43,6 +43,7 @@ const db = new sqlite3.Database(dbPath, (err) => {
     })
 });
 
+// create a new user account - add new row of user data into database
 app.post("/create-new-account", (req, res) => {
     const { firstName, lastName, username, password } = req.body;
 
@@ -68,6 +69,7 @@ app.post("/create-new-account", (req, res) => {
     });
 });
 
+// returns all users in the database
 app.get('/all-users', (req, res) => {
     const query = "SELECT * FROM users";
 
