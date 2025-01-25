@@ -3,6 +3,7 @@ const fs = require('fs');                       // for reading and writing files
 const path = require('path');                   // for working with files and directory paths
 const cors = require('cors');
 const sqlite3 = require("sqlite3").verbose();   // sqlite3 database
+const dbPath = path.resolve(__dirname, '../data/database.db'); // Adjust 'database.db' as needed
 
 const app = express();
 const PORT = 5000;
@@ -14,46 +15,73 @@ app.use(cors());
 app.use(express.json());
 
 // Connect to SQLite database
-const db = new sqlite3.Database("../data/database.db", (err) => {
+const db = new sqlite3.Database(dbPath, (err) => {
     if (err) {
       console.error("Failed to connect to database:", err.message);
     } else {
       console.log("Connected to SQLite database.");
     }
+
+    // Create the "users" table if it doesn't exist
+    db.serialize(() => {
+        db.run(
+            `CREATE TABLE IF NOT EXISTS users (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                firstName TEXT NOT NULL,
+                lastName TEXT NOT NULL,
+                username TEXT NOT NULL UNIQUE,
+                password TEXT NOT NULL
+            )`,
+            (err) => {
+                if (err) {
+                    console.error("Error creating users table:", err);
+                } else {
+                    console.log("Users table created or already exists.");
+                }
+            }
+        )
+    })
 });
 
-// Example route to test database
-app.get("/test-db", (req, res) => {
-    db.serialize(() => {
-        // Create a test table (if it doesn't exist)
-        db.run(
-            "CREATE TABLE IF NOT EXISTS test (id INTEGER PRIMARY KEY, name TEXT)",
-            (err) => {
-            if (err) {
-                res.status(500).send("Error creating table: " + err.message);
-                return;
+app.post("/create-new-account", (req, res) => {
+    const { firstName, lastName, username, password } = req.body;
+
+    if (!firstName || !lastName ||
+        !username || !password
+    ) {
+        return res.status(400).json({ error: "Missing fields for creating account." });
+    }
+
+    // Insert user into database
+    const query = `INSERT INTO users (firstName, lastName, username, password) VALUES (?, ?, ?, ?)`;
+    db.run(query, [firstName, lastName, username, password], function (err) {
+        if (err) {
+            if (err.code === "SQLITE_CONSTRAINT") {
+                return res.status(400).json({ error: "Username already exists." });
             }
-            }
-        );
-    
-        // Insert a test row
-        db.run("INSERT INTO test (name) VALUES (?)", ["John Doe"], (err) => {
-            if (err) {
-            res.status(500).send("Error inserting data: " + err.message);
-            return;
-            }
-        });
-    
-        // Query the table
-        db.all("SELECT * FROM test", [], (err, rows) => {
-            if (err) {
-            res.status(500).send("Error querying database: " + err.message);
-            return;
-            }
-            res.json(rows); // Send the rows as a response
-        });
+            console.error("Error inserting user:", err);
+            return res.status(500).json({ error: "Database error." });
+        }
+
+        // Respond with success
+        return res.status(201).json({ message: "User created successfully!", userId: this.lastID });
     });
 });
+
+app.get('/all-users', (req, res) => {
+    const query = "SELECT * FROM users";
+
+    db.all(query, [], (err, rows) => {
+        if (err) {
+            console.error("Error retrieving users:", err);
+            return res.status(500).json({ error: "Database error." });
+        }
+
+        // Respond with all users as JSON
+        res.status(200).json({ users: rows });
+    })
+})
+
 
 // Start the server
 app.listen(PORT, () => {
