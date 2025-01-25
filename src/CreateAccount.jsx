@@ -34,7 +34,7 @@ function CreateAccount() {
         setPassword(event.target.value);
     }
     
-    const handleCreateClick = () => {
+    const handleCreateClick = async () => {
         // when the 'Create' button is clicked
         if (firstName && lastName && username && password) {
             console.log(`first name: ${firstName}`);
@@ -66,6 +66,27 @@ function CreateAccount() {
         } else {
             setPasswordEmpty(false);
         }
+
+        createNewAccount(firstName, lastName, username, password)
+    }
+
+    const createNewAccount = async (firstName, lastName, username, password) => {
+        // create a new account and store into database
+        const response = await fetch("http://localhost:5000/create-new-account", {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ firstName, lastName, username, password }),
+        })
+
+        const data = await response.json();
+        if (!response.ok) {
+            console.log(data.error);
+            return;
+        }
+
+        console.log(data.message);
     }
 
     return <>
