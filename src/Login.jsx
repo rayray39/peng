@@ -1,11 +1,13 @@
 import { Box, Stack, TextField, Button, Link } from "@mui/material";
 import { Link as RouterLink } from 'react-router-dom';
 import { useState } from "react";
+import { useUser } from "./UserContext";
 
 // login user account page
 function Login() {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
+    const { login } = useUser();
 
     // for empty field validation
     const [usernameEmpty, setUsernameEmpty] = useState(false);
@@ -41,6 +43,27 @@ function Login() {
         } else {
             setPasswordEmpty(false);
         }
+
+        logUserIn(username, password);
+    }
+
+    const logUserIn = async (username, password) => {
+        const response = await fetch('http://localhost:5000/log-user-in', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ username, password })
+        })
+
+        const data = await response.json();
+        if (!response.ok) {
+            console.log(data.error);
+            return;
+        }
+
+        console.log(data.message);
+        login(data.user);
     }
 
     return <Box sx={{
