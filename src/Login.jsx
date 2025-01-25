@@ -46,7 +46,6 @@ function Login() {
             display: 'flex',
             justifyContent: 'center',
             transform: "translate(0%, 50%)", // Center it perfectly
-            // border: '1px solid black'
         }}>
         <Stack direction='column' spacing={2} sx={{width: '500px'}}>
             <h2>Log In To Your Account</h2>

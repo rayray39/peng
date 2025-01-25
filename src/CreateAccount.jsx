@@ -73,7 +73,6 @@ function CreateAccount() {
             display: 'flex',
             justifyContent: 'center',
             transform: "translate(0%, 30%)", // Center it perfectly
-            // border: '1px solid black'
         }}>
             <Stack direction='column' spacing={2} sx={{width: '500px'}}>
                 <h2>Create Your Account</h2>
@@ -92,7 +91,7 @@ function CreateAccount() {
                 <Button variant="contained" sx={{height:'50px', backgroundColor:'orange'}} disableElevation onClick={handleCreateClick}>Create</Button>
 
                 {/* link to CreateAccount */}
-                <Link component={RouterLink} to='/' underline="hover">
+                <Link component={RouterLink} to='/login' underline="hover">
                     {"Already have an account? Log In"}
                 </Link>
             </Stack>
