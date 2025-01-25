@@ -17,6 +17,8 @@ function WelcomePage() {
     return <>
         <h1>Welcome to Peng 💘</h1>
 
+        <h4>A simple and no nonsense dating app. Swipe, Chat, and Date.</h4>
+
         <Box sx={{
             display: 'flex',
             justifyContent: 'center',
