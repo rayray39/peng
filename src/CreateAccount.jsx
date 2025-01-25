@@ -41,7 +41,7 @@ function CreateAccount() {
             console.log(`username: ${username}`);
             console.log(`password: ${password}`);
         } else {
-            console.log('Error: A field is empty');
+            console.log('Error in CreateAccount: A field is empty');
         }
 
         // client-side field validation
