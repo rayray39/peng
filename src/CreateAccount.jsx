@@ -6,11 +6,13 @@ function CreateAccount() {
     // text fields' state
     const [firstName, setFirstName] = useState('');
     const [lastName, setLastName] = useState('');
+    const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
 
     // for empty field validation
     const [firstNameEmpty, setFirstNameEmpty] = useState(false);
     const [lastNameEmpty, setLastNameEmpty] = useState(false);
+    const [usernameEmpty, setUsernameEmpty] = useState(false);
     const [passwordEmpty, setPasswordEmpty] = useState(false);
 
     const fieldIsEmpty = 'Please do not leave blank!';
@@ -23,15 +25,20 @@ function CreateAccount() {
         setLastName(event.target.value);
     }
 
+    const handleUsername = (event) => {
+        setUsername(event.target.value);
+    }
+
     const handlePassword = (event) => {
         setPassword(event.target.value);
     }
     
     const handleCreateClick = () => {
         // when the 'Create' button is clicked
-        if (firstName && lastName && password) {
+        if (firstName && lastName && username && password) {
             console.log(`first name: ${firstName}`);
             console.log(`last name: ${lastName}`);
+            console.log(`username: ${username}`);
             console.log(`password: ${password}`);
         } else {
             console.log('Error: A field is empty');
@@ -47,6 +54,11 @@ function CreateAccount() {
             setLastNameEmpty(true);
         } else {
             setLastNameEmpty(false);
+        }
+        if (username === '') {
+            setUsernameEmpty(true);
+        } else {
+            setUsernameEmpty(false);
         }
         if (password === '') {
             setPasswordEmpty(true);
@@ -70,7 +82,8 @@ function CreateAccount() {
                 <TextField id="create-lastname" label='Last Name' variant="outlined" error={lastNameEmpty} 
                     helperText={lastNameEmpty ? fieldIsEmpty : null} value={lastName} onChange={handleLastName}/>
 
-                <TextField id="create-username" label='Username' variant="outlined" helperText='Set a  username for future log ins.'/>
+                <TextField id="create-username" label='Username' variant="outlined" error={usernameEmpty}
+                    helperText={usernameEmpty ? fieldIsEmpty : 'Set a username for future logins.'} value={username} onChange={handleUsername}/>
 
                 <TextField id="create-password" label='Password' variant="outlined" type="password" error={passwordEmpty}
                     helperText={passwordEmpty ? fieldIsEmpty : null} value={password} onChange={handlePassword}/>
