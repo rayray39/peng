@@ -77,6 +77,7 @@ function Login() {
     }
 
     const getCurrentUser = () => {
+        // for debugging
         console.log(`current user: ${currentUser.username}`);
     }
 
@@ -97,8 +98,6 @@ function Login() {
 
             <Button variant="contained" sx={{height:'50px', backgroundColor:'orange'}} disableElevation 
                 onClick={handleCreateClick} >Log In</Button>
-
-            <button onClick={getCurrentUser}>get current user</button>
 
             {/* link to CreateAccount */}
             <Link component={RouterLink} to='/create-account' underline="hover">
