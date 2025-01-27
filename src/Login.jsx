@@ -16,8 +16,6 @@ function Login() {
 
     const [passwordIncorrect, setPasswordIncorrect] = useState(false);
 
-    const [logInSuccessful, setLogInSuccessful] = useState(false);
-
     const fieldIsEmpty = 'Please do not leave blank!';
     const passwordIsIncorect = 'Password is incorrect!';
 
