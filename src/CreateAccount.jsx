@@ -2,9 +2,11 @@ import { Box, Stack, TextField, Link } from "@mui/material"
 import { Link as RouterLink } from 'react-router-dom';
 import Button from '@mui/material/Button';
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 // create user account page - user sign up page
 function CreateAccount() {
+    const navigate = useNavigate();
     // text fields' state
     const [firstName, setFirstName] = useState('');
     const [lastName, setLastName] = useState('');
@@ -72,7 +74,7 @@ function CreateAccount() {
             setPasswordEmpty(false);
         }
 
-        createNewAccount(firstName, lastName, username, password)
+        createNewAccount(firstName, lastName, username, password);
     }
 
     const createNewAccount = async (firstName, lastName, username, password) => {
@@ -97,6 +99,7 @@ function CreateAccount() {
         }
 
         console.log(data.message);
+        navigate('/fill-in-bio');   // navigate to FillBio if account created successfully
     }
 
     return <>
