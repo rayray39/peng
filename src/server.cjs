@@ -65,7 +65,13 @@ app.post("/create-new-account", (req, res) => {
         }
 
         // Respond with success
-        return res.status(201).json({ message: "User created successfully!", userId: this.lastID });
+        return res.status(201).json({ 
+            message: "User created successfully!", 
+            user: {
+                id: row.id,
+                username: row.username
+            }
+        });
     });
 });
 
