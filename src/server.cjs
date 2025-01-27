@@ -30,7 +30,8 @@ const db = new sqlite3.Database(dbPath, (err) => {
                 firstName TEXT NOT NULL,
                 lastName TEXT NOT NULL,
                 username TEXT NOT NULL UNIQUE,
-                password TEXT NOT NULL
+                password TEXT NOT NULL,
+                bio TEXT
             )`,
             (err) => {
                 if (err) {
@@ -55,7 +56,7 @@ app.post("/create-new-account", (req, res) => {
 
     // Insert user into database
     const query = `INSERT INTO users (firstName, lastName, username, password) VALUES (?, ?, ?, ?)`;
-    db.run(query, [firstName, lastName, username, password], function (err) {
+    db.run(query, [firstName, lastName, username, password], function (err, row) {
         if (err) {
             if (err.code === "SQLITE_CONSTRAINT") {
                 return res.status(400).json({ error: "Username already exists." });
@@ -65,7 +66,13 @@ app.post("/create-new-account", (req, res) => {
         }
 
         // Respond with success
-        return res.status(201).json({ message: "User created successfully!", userId: this.lastID });
+        return res.status(201).json({ 
+            message: "User created successfully!", 
+            user: {
+                id: row.id,
+                username: row.username
+            }
+        });
     });
 });
 
@@ -103,6 +110,40 @@ app.post("/log-user-in", (req, res) => {
             }
         });
     });
+})
+
+// updates currently logged in user's bio
+app.post('/save-bio', (req, res) => {
+    const { currentUser, bio } = req.body;
+
+    if (!bio) {
+        return res.status(400).json({ error: 'Missing bio.' });
+    }
+    if (!currentUser) {
+        return res.status(400).json({ error: 'User not logged in.' });
+    }
+
+    const query = `
+        UPDATE users
+        SET bio = ?
+        WHERE id = ? AND username = ?
+    `;
+
+    db.run(query, [bio, currentUser.id, currentUser.username], function (err) {
+        if (err) {
+            console.error("Error updating bio:", err);
+            return res.status(500).json({ error: "Database error." });
+        }
+    
+        if (this.changes === 0) {
+            return res.status(404).json({ error: "User not found." });
+        }
+    
+        res.status(200).json({
+            message: "Bio updated successfully!",
+        });
+    })
+
 })
 
 // returns all users in the database

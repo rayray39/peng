@@ -2,14 +2,18 @@ import { Box, Stack, TextField, Link } from "@mui/material"
 import { Link as RouterLink } from 'react-router-dom';
 import Button from '@mui/material/Button';
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { useUser } from "./UserContext";
 
 // create user account page - user sign up page
 function CreateAccount() {
+    const navigate = useNavigate();
     // text fields' state
     const [firstName, setFirstName] = useState('');
     const [lastName, setLastName] = useState('');
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
+    const { login, currentUser } = useUser();       // use context to assign current logged in user.
 
     // for empty field validation
     const [firstNameEmpty, setFirstNameEmpty] = useState(false);
@@ -72,7 +76,7 @@ function CreateAccount() {
             setPasswordEmpty(false);
         }
 
-        createNewAccount(firstName, lastName, username, password)
+        createNewAccount(firstName, lastName, username, password);
     }
 
     const createNewAccount = async (firstName, lastName, username, password) => {
@@ -97,6 +101,11 @@ function CreateAccount() {
         }
 
         console.log(data.message);
+        login(data.user);
+
+        console.log(`currently logged in user: ${data.user.username}`);
+
+        navigate('/fill-in-bio');   // navigate to FillBio if account created successfully
     }
 
     return <>

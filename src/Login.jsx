@@ -1,13 +1,14 @@
 import { Box, Stack, TextField, Button, Link } from "@mui/material";
-import { Link as RouterLink } from 'react-router-dom';
+import { Link as RouterLink, useNavigate } from 'react-router-dom';
 import { useState } from "react";
 import { useUser } from "./UserContext";
 
 // login user account page
 function Login() {
+    const navigate = useNavigate();
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
-    const { login, currentUser } = useUser();
+    const { login, currentUser } = useUser();       // use context to assign current logged in user.
 
     // for empty field validation
     const [usernameEmpty, setUsernameEmpty] = useState(false);
@@ -73,7 +74,11 @@ function Login() {
 
         console.log(data.message);
         setPasswordIncorrect(false);
-        login(data.user);   // use function in context to set current user
+        login(data.user);               // use function in context to set current user
+
+        console.log(`currently logged in user: ${data.user.username}`);
+
+        navigate('/fill-in-bio');       // navigate to FillBio if successfully logged in.
     }
 
     const getCurrentUser = () => {
