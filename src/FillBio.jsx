@@ -16,22 +16,22 @@ function FillBio() {
         // when the Next button is clicked
         // make a post request to save the bio to currently logged in user
 
-        // const response = await fetch('http://localhost:5000/save-bio', {
-        //     method:'POST',
-        //     headers: {
-        //         'Content-Type': 'application/json',
-        //     },
-        //     body: JSON.stringify({ currentUser, bio }),
-        // })
+        const response = await fetch('http://localhost:5000/save-bio', {
+            method:'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ currentUser, bio }),
+        })
 
-        // const data = await response.json();
+        const data = await response.json();
 
-        // if (!response.ok) {
-        //     console.error(data.error);
-        //     return;
-        // }
+        if (!response.ok) {
+            console.error(data.error);
+            return;
+        }
 
-        // console.log(data.message); // "Bio updated successfully."
+        console.log(data.message); // "Bio updated successfully."
         // navigate('/select-hobbies');
         console.log(`the bio is : ${bio}`);
     }
