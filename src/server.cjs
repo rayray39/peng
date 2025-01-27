@@ -56,7 +56,7 @@ app.post("/create-new-account", (req, res) => {
 
     // Insert user into database
     const query = `INSERT INTO users (firstName, lastName, username, password) VALUES (?, ?, ?, ?)`;
-    db.run(query, [firstName, lastName, username, password], function (err, row) {
+    db.run(query, [firstName, lastName, username, password], function (err) {
         if (err) {
             if (err.code === "SQLITE_CONSTRAINT") {
                 return res.status(400).json({ error: "Username already exists." });
@@ -69,8 +69,8 @@ app.post("/create-new-account", (req, res) => {
         return res.status(201).json({ 
             message: "User created successfully!", 
             user: {
-                id: row.id,
-                username: row.username
+                id: this.lastID,
+                username: username
             }
         });
     });
