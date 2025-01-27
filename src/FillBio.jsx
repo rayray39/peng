@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom"
 import { useUser } from "./UserContext";
 import { useState } from "react";
 
+// page for filling up the bio during account setup journey
 function FillBio() {
     const navigate = useNavigate();
     const { currentUser } = useUser();
@@ -32,8 +33,8 @@ function FillBio() {
         }
 
         console.log(data.message); // "Bio updated successfully."
-        // navigate('/select-hobbies');
         console.log(`the bio is : ${bio}`);
+        navigate('/select-hobbies');
     }
 
     return (
