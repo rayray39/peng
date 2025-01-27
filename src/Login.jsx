@@ -75,6 +75,9 @@ function Login() {
         console.log(data.message);
         setPasswordIncorrect(false);
         login(data.user);               // use function in context to set current user
+
+        console.log(`currently logged in user: ${data.user.username}`);
+
         navigate('/fill-in-bio');       // navigate to FillBio if successfully logged in.
     }
 

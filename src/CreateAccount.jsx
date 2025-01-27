@@ -102,6 +102,9 @@ function CreateAccount() {
 
         console.log(data.message);
         login(data.user);
+
+        console.log(`currently logged in user: ${data.user.username}`);
+
         navigate('/fill-in-bio');   // navigate to FillBio if account created successfully
     }
 
