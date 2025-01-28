@@ -1,9 +1,15 @@
-import { Box } from "@mui/material";
+import { Box, Stack } from "@mui/material";
 
 function Hobbies() {
     return (
-        <Box>
-            <h2>This is the hobbies page</h2>
+        <Box sx={{
+            display: 'flex',
+            justifyContent: 'center',
+            transform: "translate(0%, 50%)", // Center it perfectly
+        }}>
+            <Stack>
+                <h2>Select 3 hobbies.</h2>
+            </Stack>
         </Box>
     )
 }
