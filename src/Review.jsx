@@ -15,7 +15,7 @@ function Review() {
             textAlign: 'center', // Center content horizontally
         }}>
             {reviews.map((review, index) => (
-                <Card variant="outlined" key={index} sx={{height:'100px'}}>
+                <Card variant="outlined" key={index} sx={{height:'80px'}}>
                 <CardContent>
                     <Typography gutterBottom sx={{ color: 'text.secondary', fontSize: 16 }}>
                         {review.user}
