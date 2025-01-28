@@ -31,7 +31,8 @@ const db = new sqlite3.Database(dbPath, (err) => {
                 lastName TEXT NOT NULL,
                 username TEXT NOT NULL UNIQUE,
                 password TEXT NOT NULL,
-                bio TEXT
+                bio TEXT,
+                hobbies TEXT
             )`,
             (err) => {
                 if (err) {
@@ -144,6 +145,39 @@ app.post('/save-bio', (req, res) => {
         });
     })
 
+})
+
+// updates currently logged in user's selected hobbies
+app.post('/save-hobbies', (req, res) => {
+    const { currentUser, selectedHobbies } = req.body;
+
+    if (!selectedHobbies) {
+        return res.status(400).json({ error: 'Missing hobbies.' });
+    }
+    if (!currentUser) {
+        return res.status(400).json({ error: 'User not logged in.' });
+    }
+
+    const query = `
+        UPDATE users
+        SET hobbies = ?
+        WHERE id = ? AND username = ?
+    `;
+
+    db.run(query, [selectedHobbies.join(","), currentUser.id, currentUser.username], function (err) {
+        if (err) {
+            console.error("Error updating hobbies:", err);
+            return res.status(500).json({ error: "Database error." });
+        }
+    
+        if (this.changes === 0) {
+            return res.status(404).json({ error: "User not found." });
+        }
+    
+        res.status(200).json({
+            message: "Hobbies updated successfully!",
+        });
+    })
 })
 
 // returns all users in the database
