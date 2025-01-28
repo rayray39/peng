@@ -28,8 +28,8 @@ function Hobbies() {
                 return;
             }
             setSelectedHobbies([...selectedHobbies, hobby]);
-            setAlreadySelectedThree(false);
         }
+        setAlreadySelectedThree(false);
     }
 
     const handleNext = async () => {
