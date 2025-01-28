@@ -9,6 +9,8 @@ function Hobbies() {
         "Handicrafts", "Food"
     ];
     const [selectedHobbies, setSelectedHobbies] = useState([]);
+    const MAX_SELECTED_HOBBIES = 3;
+    const [alreadySelectedThree, setAlreadySelectedThree] = useState(false);
 
     const handleChipClick = (hobby) => {
         // when a single chip is being clicked on
@@ -18,7 +20,13 @@ function Hobbies() {
             setSelectedHobbies(selectedHobbies.filter((item) => item !== hobby));
         } else {
             // Add hobby to selected hobbies
+            if (selectedHobbies.length === MAX_SELECTED_HOBBIES) {
+                setAlreadySelectedThree(true);
+                console.log("selected max. number of hobbies");
+                return;
+            }
             setSelectedHobbies([...selectedHobbies, hobby]);
+            setAlreadySelectedThree(false);
         }
     }
 
@@ -29,7 +37,7 @@ function Hobbies() {
             transform: "translate(0%, 50%)", // Center it perfectly
         }}>
             <Stack direction='column' spacing={2} sx={{width: '500px'}}>
-                <h2>Select 3 hobbies 🏸🍣🛫</h2>
+                <h2>Select {MAX_SELECTED_HOBBIES} hobbies 🏸🍣🛫</h2>
 
                 <TextField label='Selected Hobbies' value={selectedHobbies.join(", ")} variant="outlined"
                     slotProps={{
@@ -37,6 +45,7 @@ function Hobbies() {
                             readOnly: true,
                         },
                     }}
+                    helperText={alreadySelectedThree ? "You have already selected 3 hobbies." : null}
                 />
 
                 {/* Chips for selecting hobbies */}
