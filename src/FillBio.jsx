@@ -52,7 +52,7 @@ function FillBio() {
             justifyContent: 'center',
             transform: "translate(0%, 50%)", // Center it perfectly
         }}>
-            <Stack>
+            <Stack direction='column' spacing={2} sx={{width: '500px'}}>
                 <h2>Write a short paragraph about yourself 📝</h2>
 
                 <TextField id="bio-textfield-multiline" label="Write a bio." multiline maxRows={3} value={bio} onChange={handleBio}
