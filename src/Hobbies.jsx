@@ -8,7 +8,7 @@ function Hobbies() {
             transform: "translate(0%, 50%)", // Center it perfectly
         }}>
             <Stack>
-                <h2>Select 3 hobbies.</h2>
+                <h2>Select 3 hobbies 🏸🍣🛫</h2>
             </Stack>
         </Box>
     )

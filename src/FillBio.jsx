@@ -9,6 +9,8 @@ function FillBio() {
     const { currentUser } = useUser();
     const [bio, setBio] = useState('');
 
+    const [bioIsEmpty, setBioIsEmpty] = useState(false);
+
     const handleBio = (event) => {
         setBio(event.target.value);
     }
@@ -16,6 +18,13 @@ function FillBio() {
     const handleNext = async () => {
         // when the Next button is clicked
         // make a post request to save the bio to currently logged in user
+
+        if (bio === '') {
+            setBioIsEmpty(true);
+            return;
+        } else {
+            setBioIsEmpty(false);
+        }
 
         const response = await fetch('http://localhost:5000/save-bio', {
             method:'POST',
@@ -47,7 +56,10 @@ function FillBio() {
                 <h2>Write a short paragraph about yourself 📝</h2>
 
                 <TextField id="bio-textfield-multiline" label="Write a bio." multiline maxRows={3} value={bio} onChange={handleBio}
-                    helperText="we don't tolerate nonsense, be serious, because you can't change it later on."/>
+                    error={bioIsEmpty}
+                    helperText={bioIsEmpty ? 
+                        "Please do not leave blank!" :
+                        "We don't tolerate nonsense, be serious, because you can't change it later on."}/>
 
                 <Button variant="contained" sx={{height:'50px', backgroundColor:'orange', marginTop:'20px'}} 
                     disableElevation onClick={handleNext} >Next</Button>
