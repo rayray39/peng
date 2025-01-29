@@ -1,6 +1,7 @@
 import { Box, Stack, TextField, Chip, Button } from "@mui/material";
 import { useState } from "react";
 import { useUser } from "./UserContext";
+import { useNavigate } from "react-router-dom";
 
 function Hobbies() {
     const availableHobbies = [
@@ -10,6 +11,7 @@ function Hobbies() {
         "Handicrafts", "Food"
     ];
     const { currentUser } = useUser();
+    const navigate = useNavigate();
     const [selectedHobbies, setSelectedHobbies] = useState([]);
     const MAX_SELECTED_HOBBIES = 3;
 
@@ -61,6 +63,7 @@ function Hobbies() {
 
         console.log(data.message);
         console.log(`selected hobbies: ${selectedHobbies}`);
+        navigate('/add-images');
     }
 
     return (
