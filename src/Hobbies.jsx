@@ -12,7 +12,9 @@ function Hobbies() {
     const { currentUser } = useUser();
     const [selectedHobbies, setSelectedHobbies] = useState([]);
     const MAX_SELECTED_HOBBIES = 3;
-    const [alreadySelectedThree, setAlreadySelectedThree] = useState(false);
+
+    const [alreadySelectedThree, setAlreadySelectedThree] = useState(false);    // already selected max num. of hobbies
+    const [yetToSelectThree, setYetToSelectThree] = useState(false);            // yet to select 3 hobbies
 
     const handleChipClick = (hobby) => {
         // when a single chip is being clicked on
@@ -30,12 +32,18 @@ function Hobbies() {
             setSelectedHobbies([...selectedHobbies, hobby]);
         }
         setAlreadySelectedThree(false);
+        setYetToSelectThree(false);
     }
 
     const handleNext = async () => {
         // when the next button is clicked
         // make a post request to save the hobbies selected for currently logged in user
-        console.log('next button is clicked');
+        if (selectedHobbies.length < MAX_SELECTED_HOBBIES) {
+            setYetToSelectThree(true);
+            return;
+        } else {
+            setYetToSelectThree(false);
+        }
 
         const response = await fetch("http://localhost:5000/save-hobbies", {
             method:'POST',
@@ -70,7 +78,9 @@ function Hobbies() {
                             readOnly: true,
                         },
                     }}
-                    helperText={alreadySelectedThree ? "You have already selected 3 hobbies." : null}
+                    helperText={alreadySelectedThree ?
+                        "You have already selected 3 hobbies." :
+                        (yetToSelectThree ? "You must select 3 hobbies." : null)}
                 />
 
                 {/* Chips for selecting hobbies */}
@@ -84,7 +94,7 @@ function Hobbies() {
                         sx={{
                             backgroundColor: selectedHobbies.includes(hobby) ? "orange" : "white",
                             "&:hover": {
-                                backgroundColor: selectedHobbies.includes(hobby) ? "orange" : "white", // Darker shade on hover
+                                backgroundColor: selectedHobbies.includes(hobby) ? "orange" : "white",
                             },
                         }}
                     />
