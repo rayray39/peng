@@ -180,6 +180,35 @@ app.post('/save-hobbies', (req, res) => {
     })
 })
 
+// updates currently logged in user's images
+app.post('/save-images', (req, res) => {
+    const { currentUser, images } = req.body;
+
+    if (!images) {
+        return res.status(400).json({ error: 'Missing images.' });
+    }
+    if (!currentUser) {
+        return res.status(400).json({ error: 'User not logged in.' });
+    }
+
+    const query = '';
+
+    db.run(query, [], function (err) {
+        if (err) {
+            console.error("Error updating images:", err);
+            return res.status(500).json({ error: "Database error." });
+        }
+    
+        if (this.changes === 0) {
+            return res.status(404).json({ error: "User not found." });
+        }
+    
+        res.status(200).json({
+            message: "Images updated successfully!",
+        });
+    })
+})
+
 // returns all users in the database
 app.get('/all-users', (req, res) => {
     const query = "SELECT * FROM users";
