@@ -7,7 +7,24 @@ function AddImages() {
 
     const handleNext = () => {
         console.log('next button is clicked');
+
+        images.forEach(image => {
+            console.log(image.file.name);
+        });
     }
+
+    const handleImageUpload = (event) => {
+        // when image file is selected
+        const files = Array.from(event.target.files); // Convert FileList to an array
+        if (files.length === 0) return; // Ensure at least one file is selected
+    
+        const newImages = files.map((file) => ({
+            file,
+            url: URL.createObjectURL(file), // Generate a temporary URL for preview
+        }));
+    
+        setImages((prevImages) => [...prevImages, ...newImages]); // Append new images
+    };
 
     const VisuallyHiddenInput = styled('input')({
         clip: 'rect(0 0 0 0)',
@@ -43,7 +60,7 @@ function AddImages() {
                     Select Image
                     <VisuallyHiddenInput
                         type="file"
-                        onChange={(event) => console.log(event.target.files)}
+                        onChange={handleImageUpload}
                         multiple
                     />
                 </Button>
