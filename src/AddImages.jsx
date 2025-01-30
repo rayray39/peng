@@ -6,6 +6,8 @@ import { useUser } from "./UserContext";
 function AddImages() {
     const { currentUser } = useUser();
     const [images, setImages] = useState([]);
+    
+    const [imageUploaded, setImageUploaded] = useState(false);
 
     const handleNext = async () => {
         // when the next button is clicked
@@ -44,12 +46,14 @@ function AddImages() {
         }));
     
         setImages((prevImages) => [...prevImages, ...newImages]); // Append new images
+        setImageUploaded(true);
     };
 
     const handleRemoveAllImages = () => {
         // when clear images button is clicked
         console.log('remove images clicked');
         setImages([]);
+        setImageUploaded(false);
     }
 
     const VisuallyHiddenInput = styled('input')({
@@ -122,7 +126,7 @@ function AddImages() {
                 }
 
                 <Button variant="contained" sx={{height:'50px', backgroundColor:'orange', marginTop:'20px'}} 
-                    disableElevation onClick={handleNext} >Next
+                    disableElevation disabled={!imageUploaded} onClick={handleNext} >Next
                 </Button>
             </Stack>
         </Box>
