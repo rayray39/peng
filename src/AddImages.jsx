@@ -5,12 +5,30 @@ import { useState } from "react";
 function AddImages() {
     const [images, setImages] = useState([]);
 
-    const handleNext = () => {
+    const handleNext = async () => {
+        // when the next button is clicked
+        // make a post request to save the images selected to account
         console.log('next button is clicked');
 
         images.forEach(image => {
             console.log(image.file.name);
         });
+
+        const response = await fetch("http://localhost:5000/save-images", {
+            method:'POST',
+            headers: {
+                'Content-Type':'application/json',
+            },
+            body: JSON.stringify({images}),
+        })
+
+        const data = await response.json();
+        if (!response.ok) {
+            console.log(data.error);
+            return;
+        }
+
+        console.log(data.message);
     }
 
     const handleImageUpload = (event) => {
