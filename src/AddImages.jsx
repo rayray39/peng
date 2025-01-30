@@ -46,6 +46,12 @@ function AddImages() {
         setImages((prevImages) => [...prevImages, ...newImages]); // Append new images
     };
 
+    const handleRemoveAllImages = () => {
+        // when clear images button is clicked
+        console.log('remove images clicked');
+        setImages([]);
+    }
+
     const VisuallyHiddenInput = styled('input')({
         clip: 'rect(0 0 0 0)',
         clipPath: 'inset(50%)',
@@ -67,23 +73,37 @@ function AddImages() {
             <Stack direction='column' spacing={2} sx={{width: '500px'}}>
                 <h2>Add at least 1 image of yourself 📹</h2>
 
-                <Button
-                    component="label"
-                    role={undefined}
-                    variant="contained"
-                    tabIndex={-1}
-                    disableElevation
-                    sx={{
-                        backgroundColor: 'orange'
-                    }}
-                >
-                    Select Image
-                    <VisuallyHiddenInput
-                        type="file"
-                        onChange={handleImageUpload}
-                        multiple
-                    />
-                </Button>
+                <Stack direction={'row'} spacing={2} sx={{width: '500px'}}>
+                    <Button
+                        component="label"
+                        role={undefined}
+                        variant="contained"
+                        disableElevation
+                        sx={{
+                            backgroundColor: 'orange',
+                            width: '50%'
+                        }}
+                    >
+                        Select Image(s)
+                        <VisuallyHiddenInput
+                            type="file"
+                            onChange={handleImageUpload}
+                            multiple
+                        />
+                    </Button>
+
+                    <Button
+                        variant="contained"
+                        disableElevation
+                        sx={{
+                            backgroundColor: 'orange',
+                            width: '50%'
+                        }}
+                        onClick={handleRemoveAllImages}
+                    >
+                        Clear Images
+                    </Button>
+                </Stack>
 
                 {
                     images.length > 0 &&
