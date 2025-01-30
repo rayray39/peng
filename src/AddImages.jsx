@@ -1,8 +1,10 @@
 import { Box, Stack, Button, ImageList, ImageListItem } from "@mui/material";
 import { styled } from '@mui/material/styles';
 import { useState } from "react";
+import { useUser } from "./UserContext";
 
 function AddImages() {
+    const { currentUser } = useUser();
     const [images, setImages] = useState([]);
 
     const handleNext = async () => {
@@ -19,7 +21,7 @@ function AddImages() {
             headers: {
                 'Content-Type':'application/json',
             },
-            body: JSON.stringify({images}),
+            body: JSON.stringify({ currentUser, images }),
         })
 
         const data = await response.json();
