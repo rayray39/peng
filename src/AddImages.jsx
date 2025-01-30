@@ -1,4 +1,4 @@
-import { Box, Stack, Button } from "@mui/material";
+import { Box, Stack, Button, ImageList, ImageListItem } from "@mui/material";
 import { styled } from '@mui/material/styles';
 import { useState } from "react";
 
@@ -60,7 +60,7 @@ function AddImages() {
         <Box sx={{
             display: 'flex',
             justifyContent: 'center',
-            transform: "translate(0%, 40%)", // Center it perfectly
+            transform: images.length > 0 ? "translate(0%, 20%)" : "translate(0%, 40%)",
         }}>
             <Stack direction='column' spacing={2} sx={{width: '500px'}}>
                 <h2>Add at least 1 image of yourself 📹</h2>
@@ -82,6 +82,22 @@ function AddImages() {
                         multiple
                     />
                 </Button>
+
+                {
+                    images.length > 0 &&
+                    <ImageList sx={{ width: 500, height: 164 }} cols={3} rowHeight={164}>
+                        {images.map((image, index) => (
+                            <ImageListItem key={index}>
+                            <img
+                                srcSet={image.url}
+                                src={image.url}
+                                alt={image.file.name}
+                                loading="lazy"
+                            />
+                            </ImageListItem>
+                        ))}
+                    </ImageList>
+                }
 
                 <Button variant="contained" sx={{height:'50px', backgroundColor:'orange', marginTop:'20px'}} 
                     disableElevation onClick={handleNext} >Next
