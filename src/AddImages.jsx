@@ -6,6 +6,7 @@ import { useUser } from "./UserContext";
 function AddImages() {
     const { currentUser } = useUser();
     const [images, setImages] = useState([]);
+    const [imageUrls, setImageUrls] = useState([]);
     
     const [imageUploaded, setImageUploaded] = useState(false);
 
@@ -18,21 +19,35 @@ function AddImages() {
             console.log(image.file.name);
         });
 
-        const response = await fetch("http://localhost:5000/save-images", {
-            method:'POST',
-            headers: {
-                'Content-Type':'application/json',
-            },
-            body: JSON.stringify({ currentUser, images }),
-        })
-
-        const data = await response.json();
-        if (!response.ok) {
-            console.log(data.error);
+        if (images.length === 0) {
+            alert('No images selected!');
             return;
         }
 
-        console.log(data.message);
+        const formData = new FormData();
+        images.forEach((image) => {
+            formData.append('images', image.file); // Append each file to the form data
+        });
+        try {
+            // Send a POST request to the backend to upload images to Cloudinary using fetch
+            const response = await fetch('http://localhost:5000/upload-to-cloud', {
+                method: 'POST',
+                body: formData, // Send form data with images
+            });
+
+            // Check if the request was successful
+            if (!response.ok) {
+                throw new Error('Failed to upload images');
+            }
+
+            const data = await response.json();
+
+            // Update the state with the image URLs received from Cloudinary
+            setImageUrls(data.imageUrls);
+            console.log('Uploaded image URLs:', data.imageUrls);
+        } catch (error) {
+            console.error('Error uploading images:', error);
+        }
     }
 
     const handleImageUpload = (event) => {
