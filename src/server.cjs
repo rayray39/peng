@@ -1,9 +1,14 @@
+require("dotenv").config({ path: '.env.local' });                     // Load env variables
 const express = require('express');             // create the server
 const fs = require('fs');                       // for reading and writing files
 const path = require('path');                   // for working with files and directory paths
 const cors = require('cors');
 const sqlite3 = require("sqlite3").verbose();   // sqlite3 database
 const dbPath = path.resolve(__dirname, '../data/database.db'); // Adjust 'database.db' as needed
+
+const multer = require("multer");
+const cloudinary = require("cloudinary").v2;
+const { CloudinaryStorage } = require("multer-storage-cloudinary");
 
 const app = express();
 const PORT = 5000;
@@ -13,6 +18,16 @@ app.use(cors());
 
 // Middleware
 app.use(express.json());
+
+// Cloudinary API
+if (process.env.CLOUDINARY_URL) {
+    console.log("Successfully connected to Cloudinary.");
+}
+
+// Configure Multer Storage for Cloudinary
+const storage = multer.memoryStorage(); // Store files in memory before uploading
+const upload = multer({ storage });
+
 
 // Connect to SQLite database
 const db = new sqlite3.Database(dbPath, (err) => {
@@ -180,34 +195,43 @@ app.post('/save-hobbies', (req, res) => {
     })
 })
 
-// updates currently logged in user's images
-app.post('/save-images', (req, res) => {
-    const { currentUser, images } = req.body;
-
-    if (!images) {
-        return res.status(400).json({ error: 'Missing images.' });
-    }
-    if (!currentUser) {
-        return res.status(400).json({ error: 'User not logged in.' });
+// API endpoint to handle multiple image uploads (to Cloudinary)
+app.post("/upload-to-cloud", upload.array("images", 5), (req, res) => {
+    if (!req.files || req.files.length === 0) {
+        return res.status(400).json({ error: "No files uploaded" });
     }
 
-    const query = '';
+    const imageUrls = []; // Array to store the image URLs
 
-    db.run(query, [], function (err) {
-        if (err) {
-            console.error("Error updating images:", err);
-            return res.status(500).json({ error: "Database error." });
-        }
-    
-        if (this.changes === 0) {
-            return res.status(404).json({ error: "User not found." });
-        }
-    
-        res.status(200).json({
-            message: "Images updated successfully!",
-        });
+    // Upload each image to Cloudinary using a Promise
+    Promise.all(
+        req.files.map((file) => {
+            return new Promise((resolve, reject) => {
+                cloudinary.uploader
+                    .upload_stream(
+                        { resource_type: "auto" }, // auto handles images and other media types
+                        (error, result) => {
+                            if (error) {
+                                reject(error); // If there's an error, reject the promise
+                            } else {
+                                imageUrls.push(result.secure_url); // Push the image URL to the array
+                                resolve();
+                            }
+                        }
+                    )
+                    .end(file.buffer); // Upload the file buffer to Cloudinary
+            });
+        })
+    )
+    .then(() => {
+        // Once all images are uploaded, send the URLs in the response
+        res.json({ imageUrls });
     })
-})
+    .catch((err) => {
+        console.error("Error uploading images:", err);
+        res.status(500).json({ error: "Image upload failed" });
+    });
+});
 
 // returns all users in the database
 app.get('/all-users', (req, res) => {
