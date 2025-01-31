@@ -58,6 +58,25 @@ const db = new sqlite3.Database(dbPath, (err) => {
             }
         )
     })
+
+    // Create a 'user_images' table to store the image URLs
+    db.serialize(() => {
+        db.run(`
+            CREATE TABLE IF NOT EXISTS user_images (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                user_id INTEGER NOT NULL,
+                image_url TEXT NOT NULL,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+            )
+        `, (err) => {
+            if (err) {
+                console.error("Error creating user_images table:", err.message);
+            } else {
+                console.log("user_images table created or already exists.");
+            }
+        });
+    });
 });
 
 // create a new user account - add new row of user data into database
