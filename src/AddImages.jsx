@@ -121,6 +121,10 @@ function AddImages() {
                     </Button>
                 </Stack>
 
+                {images.length > 3 &&
+                    <p style={{color:'red'}}>Please select only 3 images!</p>
+                }
+
                 {
                     images.length > 0 &&
                     <ImageList sx={{ width: 500, height: 164 }} cols={3} rowHeight={164}>
