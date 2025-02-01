@@ -1,9 +1,15 @@
+require("dotenv").config({ path: '.env.local' });                     // Load env variables
 const express = require('express');             // create the server
 const fs = require('fs');                       // for reading and writing files
 const path = require('path');                   // for working with files and directory paths
 const cors = require('cors');
 const sqlite3 = require("sqlite3").verbose();   // sqlite3 database
 const dbPath = path.resolve(__dirname, '../data/database.db'); // Adjust 'database.db' as needed
+
+const multer = require("multer");
+const { Readable } = require("stream");
+const cloudinary = require("cloudinary").v2;
+const { CloudinaryStorage } = require("multer-storage-cloudinary");
 
 const app = express();
 const PORT = 5000;
@@ -13,6 +19,17 @@ app.use(cors());
 
 // Middleware
 app.use(express.json());
+
+// Cloudinary API
+if (process.env.CLOUDINARY_URL) {
+    console.log("Successfully connected to Cloudinary.");
+    console.log("---------------------------------------");
+}
+
+// Configure Multer Storage for Cloudinary
+const storage = multer.memoryStorage(); // Store files in memory before uploading
+const upload = multer({ storage });
+
 
 // Connect to SQLite database
 const db = new sqlite3.Database(dbPath, (err) => {
@@ -43,6 +60,24 @@ const db = new sqlite3.Database(dbPath, (err) => {
             }
         )
     })
+
+    // Create a 'user_images' table to store the image URLs
+    db.serialize(() => {
+        db.run(`
+            CREATE TABLE IF NOT EXISTS user_images (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                user_id INTEGER NOT NULL,
+                image_url TEXT NOT NULL,
+                FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+            )
+        `, (err) => {
+            if (err) {
+                console.error("Error creating user_images table:", err.message);
+            } else {
+                console.log("user_images table created or already exists.");
+            }
+        });
+    });
 });
 
 // create a new user account - add new row of user data into database
@@ -180,6 +215,51 @@ app.post('/save-hobbies', (req, res) => {
     })
 })
 
+// Function to upload a single image to Cloudinary using a Promise
+const uploadToCloudinary = (fileBuffer) => {
+    return new Promise((resolve, reject) => {
+        const uploadStream = cloudinary.uploader.upload_stream(
+            { folder: "user_images" }, // Cloudinary folder
+            (error, result) => {
+                if (error) reject(error);
+                else resolve(result.secure_url); // Return Cloudinary URL
+            }
+        );
+        Readable.from(fileBuffer).pipe(uploadStream); // Convert buffer to stream and upload
+    });
+};
+
+// API endpoint to handle multiple image uploads (to Cloudinary)
+app.post("/upload-to-cloud", upload.array("images", 3), async (req, res) => {
+    try {
+        const files = req.files;            // Get uploaded files from request
+        const userId = req.body.userId;     // Assume user ID is sent in request body
+
+        if (!files || files.length === 0) {
+            return res.status(400).json({ error: "No files uploaded" });
+        }
+
+        // Upload all images to Cloudinary in parallel
+        const imageUrls = await Promise.all(files.map(file => uploadToCloudinary(file.buffer)));
+
+        // Insert uploaded image URLs into SQLite
+        const insertQuery = `INSERT INTO user_images (user_id, image_url) VALUES (?, ?)`;
+
+        db.serialize(() => {
+            const stmt = db.prepare(insertQuery);
+            imageUrls.forEach(url => {
+                stmt.run(userId, url);
+            });
+            stmt.finalize();
+        });
+
+        res.json({ message: "Images uploaded successfully", imageUrls });
+    } catch (error) {
+        console.error("Error uploading images:", error);
+        res.status(500).json({ error: "Image upload failed" });
+    }
+});
+
 // returns all users in the database
 app.get('/all-users', (req, res) => {
     const query = "SELECT * FROM users";
@@ -195,8 +275,26 @@ app.get('/all-users', (req, res) => {
     })
 })
 
+// returns all uploaded images of particular user
+app.get('/images/:userId', (req, res) => {
+    const userId = req.params.userId;
+
+    db.all(
+        'SELECT * FROM user_images WHERE user_id = ?',
+        [userId],
+        (err, rows) => {
+            if (err) {
+                console.error("Error fetching images:", err.message);
+                return res.status(500).json({ error: "Error fetching images" });
+            }
+            res.json({ images: rows });
+        }
+    );
+})
+
 
 // Start the server
 app.listen(PORT, () => {
     console.log(`Server is running on http://localhost:${PORT}`);
+    console.log("---------------------------------------");
 });

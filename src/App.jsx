@@ -5,6 +5,8 @@ import Login from './Login'
 import WelcomePage from './WelcomePage';
 import FillBio from './FillBio';
 import Hobbies from './Hobbies';
+import AddImages from './AddImages';
+import People from './People';
 
 function App() {
     return <>
@@ -15,6 +17,8 @@ function App() {
                 <Route path="/create-account" element={<CreateAccount />} />
                 <Route path="/fill-in-bio" element={<FillBio />} />
                 <Route path='/select-hobbies' element={<Hobbies/>}/>
+                <Route path='/add-images' element={<AddImages/>}/>
+                <Route path='/people' element={<People/>}/>
             </Routes>
         </Router>
     </>
