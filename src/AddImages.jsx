@@ -1,4 +1,4 @@
-import { Box, Stack, Button, ImageList, ImageListItem } from "@mui/material";
+import { Box, Stack, Button, ImageList, ImageListItem, CircularProgress } from "@mui/material";
 import { styled } from '@mui/material/styles';
 import { useState } from "react";
 import { useUser } from "./UserContext";
@@ -12,6 +12,7 @@ function AddImages() {
     const [imageUrls, setImageUrls] = useState([]);
     
     const [threeImagesUploaded, setThreeImagesUploaded] = useState(false);  // limit num of uploaded images to 3
+    const [uploadImagesLoading, setUploadImagesLoading] = useState(false);
 
     const handleNext = async () => {
         // when the next button is clicked
@@ -20,6 +21,7 @@ function AddImages() {
             alert('No images selected!');
             return;
         }
+        setUploadImagesLoading(true);
 
         const formData = new FormData();
         formData.append("userId", currentUser.id); // Append user ID
@@ -40,6 +42,9 @@ function AddImages() {
             const data = await response.json();
             setImageUrls(data.imageUrls);
             console.log(data.message);
+            if (data.imageUrls) {
+                setUploadImagesLoading(false);
+            }
             console.log('Uploaded image URLs:', data.imageUrls);
 
             navigate('/people');
@@ -73,6 +78,27 @@ function AddImages() {
         setThreeImagesUploaded(false);
     }
 
+    // to delete images from database, for debugging
+    const deleteAllImages = async () => {
+        console.log('deleting all images');
+
+        const response = await fetch('http://localhost:5000/delete-all-images', {
+            method:'DELETE',
+            headers:{
+                'Content-Type':'application/json',
+            },
+            body: JSON.stringify({ currentUser })
+        })
+
+        const data = await response.json();
+        if (!response.ok) {
+            console.log(data.error);
+            return;
+        }
+
+        console.log(data.message);
+    }
+
     const VisuallyHiddenInput = styled('input')({
         clip: 'rect(0 0 0 0)',
         clipPath: 'inset(50%)',
@@ -94,7 +120,7 @@ function AddImages() {
             <Stack direction='column' spacing={2} sx={{width: '500px'}}>
                 <h2>Select 3 images of yourself 📹</h2>
 
-                <Stack direction={'row'} spacing={2} sx={{width: '500px'}}>
+                <Stack direction={'row'} spacing={2} sx={{width: '500px', alignContent:'center'}}>
                     <Button
                         component="label"
                         role={undefined}
@@ -149,6 +175,9 @@ function AddImages() {
                 <Button variant="contained" sx={{height:'50px', backgroundColor:'orange', marginTop:'20px'}} 
                     disableElevation disabled={!threeImagesUploaded} onClick={handleNext} >Next
                 </Button>
+                {uploadImagesLoading && <CircularProgress />}
+
+                {/* <button onClick={deleteAllImages}>delete all images</button> */}
             </Stack>
         </Box>
     )
