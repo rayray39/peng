@@ -229,7 +229,7 @@ const uploadToCloudinary = (fileBuffer) => {
     });
 };
 
-// API endpoint to handle multiple image uploads (to Cloudinary)
+// API endpoint to handle multiple image uploads (to Cloudinary and database)
 app.post("/upload-to-cloud", upload.array("images", 3), async (req, res) => {
     try {
         const files = req.files;            // Get uploaded files from request
@@ -290,6 +290,28 @@ app.get('/images/:userId', (req, res) => {
             res.json({ images: rows });
         }
     );
+})
+
+// to delete all the images (in database) for currently logged in user
+app.delete('/delete-all-images', (req, res) => {
+    const { currentUser } = req.body;
+
+    if (!currentUser) {
+        return res.status(400).json({ error:"User not logged in" });
+    }
+
+    const query = 'DELETE FROM user_images WHERE user_id = ?';
+
+    db.run(query, [currentUser.id], function (err) {
+        if (err) {
+            console.error("Error deleting images:", err);
+            return res.status(500).json({ error: "Database error." });
+        }
+    
+        res.status(200).json({
+            message: "Images deleted successfully!",
+        });
+    })
 })
 
 
