@@ -13,18 +13,13 @@ function AddImages() {
     const handleNext = async () => {
         // when the next button is clicked
         // make a post request to save the images selected to account
-        console.log('next button is clicked');
-
-        images.forEach(image => {
-            console.log(image.file.name);
-        });
-
         if (images.length === 0) {
             alert('No images selected!');
             return;
         }
 
         const formData = new FormData();
+        formData.append("userId", currentUser.id); // Append user ID
         images.forEach((image) => {
             formData.append('images', image.file); // Append each file to the form data
         });
@@ -32,18 +27,16 @@ function AddImages() {
             // Send a POST request to the backend to upload images to Cloudinary using fetch
             const response = await fetch('http://localhost:5000/upload-to-cloud', {
                 method: 'POST',
-                body: formData, // Send form data with images
+                body: formData, // Send form data with currentUser.id and images
             });
 
-            // Check if the request was successful
             if (!response.ok) {
                 throw new Error('Failed to upload images');
             }
 
             const data = await response.json();
-
-            // Update the state with the image URLs received from Cloudinary
             setImageUrls(data.imageUrls);
+            console.log(data.message);
             console.log('Uploaded image URLs:', data.imageUrls);
         } catch (error) {
             console.error('Error uploading images:', error);

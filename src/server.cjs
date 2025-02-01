@@ -7,6 +7,7 @@ const sqlite3 = require("sqlite3").verbose();   // sqlite3 database
 const dbPath = path.resolve(__dirname, '../data/database.db'); // Adjust 'database.db' as needed
 
 const multer = require("multer");
+const { Readable } = require("stream");
 const cloudinary = require("cloudinary").v2;
 const { CloudinaryStorage } = require("multer-storage-cloudinary");
 
@@ -66,7 +67,6 @@ const db = new sqlite3.Database(dbPath, (err) => {
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 user_id INTEGER NOT NULL,
                 image_url TEXT NOT NULL,
-                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                 FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
             )
         `, (err) => {
@@ -214,42 +214,49 @@ app.post('/save-hobbies', (req, res) => {
     })
 })
 
-// API endpoint to handle multiple image uploads (to Cloudinary)
-app.post("/upload-to-cloud", upload.array("images", 5), (req, res) => {
-    if (!req.files || req.files.length === 0) {
-        return res.status(400).json({ error: "No files uploaded" });
-    }
-
-    const imageUrls = []; // Array to store the image URLs
-
-    // Upload each image to Cloudinary using a Promise
-    Promise.all(
-        req.files.map((file) => {
-            return new Promise((resolve, reject) => {
-                cloudinary.uploader
-                    .upload_stream(
-                        { resource_type: "auto" }, // auto handles images and other media types
-                        (error, result) => {
-                            if (error) {
-                                reject(error); // If there's an error, reject the promise
-                            } else {
-                                imageUrls.push(result.secure_url); // Push the image URL to the array
-                                resolve();
-                            }
-                        }
-                    )
-                    .end(file.buffer); // Upload the file buffer to Cloudinary
-            });
-        })
-    )
-    .then(() => {
-        // Once all images are uploaded, send the URLs in the response
-        res.json({ imageUrls });
-    })
-    .catch((err) => {
-        console.error("Error uploading images:", err);
-        res.status(500).json({ error: "Image upload failed" });
+// Function to upload a single image to Cloudinary using a Promise
+const uploadToCloudinary = (fileBuffer) => {
+    return new Promise((resolve, reject) => {
+        const uploadStream = cloudinary.uploader.upload_stream(
+            { folder: "user_images" }, // Cloudinary folder
+            (error, result) => {
+                if (error) reject(error);
+                else resolve(result.secure_url); // Return Cloudinary URL
+            }
+        );
+        Readable.from(fileBuffer).pipe(uploadStream); // Convert buffer to stream and upload
     });
+};
+
+// API endpoint to handle multiple image uploads (to Cloudinary)
+app.post("/upload-to-cloud", upload.array("images", 3), async (req, res) => {
+    try {
+        const files = req.files;            // Get uploaded files from request
+        const userId = req.body.userId;     // Assume user ID is sent in request body
+
+        if (!files || files.length === 0) {
+            return res.status(400).json({ error: "No files uploaded" });
+        }
+
+        // Upload all images to Cloudinary in parallel
+        const imageUrls = await Promise.all(files.map(file => uploadToCloudinary(file.buffer)));
+
+        // Insert uploaded image URLs into SQLite
+        const insertQuery = `INSERT INTO user_images (user_id, image_url) VALUES (?, ?)`;
+
+        db.serialize(() => {
+            const stmt = db.prepare(insertQuery);
+            imageUrls.forEach(url => {
+                stmt.run(userId, url);
+            });
+            stmt.finalize();
+        });
+
+        res.json({ message: "Images uploaded successfully", imageUrls });
+    } catch (error) {
+        console.error("Error uploading images:", error);
+        res.status(500).json({ error: "Image upload failed" });
+    }
 });
 
 // returns all users in the database
