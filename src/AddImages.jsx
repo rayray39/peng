@@ -8,7 +8,7 @@ function AddImages() {
     const [images, setImages] = useState([]);
     const [imageUrls, setImageUrls] = useState([]);
     
-    const [imageUploaded, setImageUploaded] = useState(false);
+    const [threeImagesUploaded, setThreeImagesUploaded] = useState(false);  // limit num of uploaded images to 3
 
     const handleNext = async () => {
         // when the next button is clicked
@@ -54,14 +54,18 @@ function AddImages() {
         }));
     
         setImages((prevImages) => [...prevImages, ...newImages]); // Append new images
-        setImageUploaded(true);
+        if (images.length + newImages.length === 3) {
+            setThreeImagesUploaded(true);
+        } else {
+            setThreeImagesUploaded(false);
+        }
     };
 
     const handleRemoveAllImages = () => {
         // when clear images button is clicked
         console.log('remove images clicked');
         setImages([]);
-        setImageUploaded(false);
+        setThreeImagesUploaded(false);
     }
 
     const VisuallyHiddenInput = styled('input')({
@@ -83,7 +87,7 @@ function AddImages() {
             transform: images.length > 0 ? "translate(0%, 20%)" : "translate(0%, 40%)",
         }}>
             <Stack direction='column' spacing={2} sx={{width: '500px'}}>
-                <h2>Add at least 1 image of yourself 📹</h2>
+                <h2>Select 3 images of yourself 📹</h2>
 
                 <Stack direction={'row'} spacing={2} sx={{width: '500px'}}>
                     <Button
@@ -134,7 +138,7 @@ function AddImages() {
                 }
 
                 <Button variant="contained" sx={{height:'50px', backgroundColor:'orange', marginTop:'20px'}} 
-                    disableElevation disabled={!imageUploaded} onClick={handleNext} >Next
+                    disableElevation disabled={!threeImagesUploaded} onClick={handleNext} >Next
                 </Button>
             </Stack>
         </Box>
