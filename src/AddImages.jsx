@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useUser } from "./UserContext";
 import { useNavigate } from "react-router-dom";
 
+// page for uploading images of currently logged in user
 function AddImages() {
     const { currentUser } = useUser();
     const navigate = useNavigate();
