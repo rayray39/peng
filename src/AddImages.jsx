@@ -120,7 +120,7 @@ function AddImages() {
             <Stack direction='column' spacing={2} sx={{width: '500px'}}>
                 <h2>Select 3 images of yourself 📹</h2>
 
-                <Stack direction={'row'} spacing={2} sx={{width: '500px', alignContent:'center'}}>
+                <Stack direction={'row'} spacing={2} sx={{width: '500px'}}>
                     <Button
                         component="label"
                         role={undefined}
@@ -175,7 +175,10 @@ function AddImages() {
                 <Button variant="contained" sx={{height:'50px', backgroundColor:'orange', marginTop:'20px'}} 
                     disableElevation disabled={!threeImagesUploaded} onClick={handleNext} >Next
                 </Button>
-                {uploadImagesLoading && <CircularProgress />}
+                
+                <Box sx={{display:'flex', justifyContent:'center'}}>
+                    {uploadImagesLoading && <CircularProgress />}
+                </Box>
 
                 {/* <button onClick={deleteAllImages}>delete all images</button> */}
             </Stack>
