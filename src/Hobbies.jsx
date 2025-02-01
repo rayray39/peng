@@ -3,6 +3,7 @@ import { useState } from "react";
 import { useUser } from "./UserContext";
 import { useNavigate } from "react-router-dom";
 
+// page to add hobbies of currently logged in user
 function Hobbies() {
     const availableHobbies = [
         "Reading", "Travelling", "Cooking",
