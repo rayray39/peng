@@ -2,9 +2,11 @@ import { Box, Stack, Button, ImageList, ImageListItem } from "@mui/material";
 import { styled } from '@mui/material/styles';
 import { useState } from "react";
 import { useUser } from "./UserContext";
+import { useNavigate } from "react-router-dom";
 
 function AddImages() {
     const { currentUser } = useUser();
+    const navigate = useNavigate();
     const [images, setImages] = useState([]);
     const [imageUrls, setImageUrls] = useState([]);
     
@@ -38,6 +40,8 @@ function AddImages() {
             setImageUrls(data.imageUrls);
             console.log(data.message);
             console.log('Uploaded image URLs:', data.imageUrls);
+
+            navigate('/people');
         } catch (error) {
             console.error('Error uploading images:', error);
         }

@@ -23,6 +23,7 @@ app.use(express.json());
 // Cloudinary API
 if (process.env.CLOUDINARY_URL) {
     console.log("Successfully connected to Cloudinary.");
+    console.log("---------------------------------------");
 }
 
 // Configure Multer Storage for Cloudinary
@@ -295,4 +296,5 @@ app.get('/images/:userId', (req, res) => {
 // Start the server
 app.listen(PORT, () => {
     console.log(`Server is running on http://localhost:${PORT}`);
+    console.log("---------------------------------------");
 });
