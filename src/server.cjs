@@ -274,6 +274,23 @@ app.get('/all-users', (req, res) => {
     })
 })
 
+// returns all uploaded images of particular user
+app.get('/images/:userId', (req, res) => {
+    const userId = req.params.userId;
+
+    db.all(
+        'SELECT * FROM user_images WHERE user_id = ?',
+        [userId],
+        (err, rows) => {
+            if (err) {
+                console.error("Error fetching images:", err.message);
+                return res.status(500).json({ error: "Error fetching images" });
+            }
+            res.json({ images: rows });
+        }
+    );
+})
+
 
 // Start the server
 app.listen(PORT, () => {
