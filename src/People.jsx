@@ -1,5 +1,6 @@
 import { Box } from "@mui/material"
 
+// page to browser through other people's profiles, explore page
 function People() {
     return (
         <Box>
