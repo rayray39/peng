@@ -1,4 +1,4 @@
-import { Box, Stack } from "@mui/material"
+import { Box, Stack, Card, CardActions, CardContent, Typography, Button } from "@mui/material"
 import { useUser } from "./UserContext"
 import { useEffect, useState } from "react";
 
@@ -59,15 +59,42 @@ function ProfileCard() {
 
     return (
         <Box>
-            <h2>This is the people page</h2>
+            <h2>This is the user profile page</h2>
 
-            <Stack>
-                <p>first name: {firstName}</p>
-                <p>last name: {lastName}</p>
-                <p>bio: {bio}</p>
-                <p>hobbies: {hobbies}</p>
-                <p>image URLs: {imageUrls}</p>
-            </Stack>
+            <Card sx={{ maxWidth: 500 }}>
+                <CardContent>
+                    <Typography gutterBottom variant="h5" component="div">
+                        {`${firstName} ${lastName}`}
+                    </Typography>
+                    <Typography variant="body2" sx={{ color: 'text.secondary' }}>
+                        {hobbies}
+                    </Typography>
+                    <Typography variant="body2" sx={{ color: 'text.secondary' }}>
+                        {bio}
+                    </Typography>
+                </CardContent>
+                <CardActions sx={{display:'flex', justifyContent:'space-between', margin:'10px'}}>
+                    <Button variant="outlined" disableElevation size="large" 
+                        sx={{color:'orange', borderColor:'orange',
+                            "&:hover": {
+                                backgroundColor: "orange",
+                                color: 'white'
+                            },
+                        }}>
+                            Pass ❌
+                    </Button>
+
+                    <Button variant="outlined" disableElevation size="large" 
+                        sx={{color:'orange', borderColor:'orange',
+                            "&:hover": {
+                                backgroundColor: "orange",
+                                color: 'white'
+                            },
+                        }}>
+                            Like ❤️
+                    </Button>
+                </CardActions>
+            </Card>
         </Box>
     )
 }
