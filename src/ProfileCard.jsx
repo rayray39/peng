@@ -69,7 +69,7 @@ function ProfileCard() {
                     <Typography variant="body2" sx={{ color: 'text.secondary' }}>
                         {hobbies}
                     </Typography>
-                    <Typography variant="body2" sx={{ color: 'text.secondary' }}>
+                    <Typography variant="body2" sx={{ color: 'text.secondary', fontSize:'18px' }}>
                         {bio}
                     </Typography>
                 </CardContent>
