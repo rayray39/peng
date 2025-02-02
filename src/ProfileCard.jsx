@@ -1,4 +1,4 @@
-import { Box, Stack, Card, CardActions, CardContent, Typography, Button } from "@mui/material"
+import { Box, Stack, Card, CardActions, CardContent, Typography, Button, Chip } from "@mui/material"
 import { useUser } from "./UserContext"
 import { useEffect, useState } from "react";
 
@@ -8,7 +8,7 @@ function ProfileCard() {
     const [firstName, setFirstName] = useState('');
     const [lastName, setLastName] = useState('');
     const [bio, setBio] = useState('');
-    const [hobbies, setHobbies] = useState('');         // comma separated string
+    const [hobbies, setHobbies] = useState([]);         // comma separated string
     const [imageUrls, setImageUrls] = useState([]);
 
     const fetchUserData = async () => {
@@ -30,7 +30,7 @@ function ProfileCard() {
         setFirstName(data.userData.firstName[0].toUpperCase() + data.userData.firstName.slice(1));
         setLastName(data.userData.lastName[0].toUpperCase() + data.userData.lastName.slice(1));
         setBio(data.userData.bio);
-        setHobbies(data.userData.hobbies);
+        setHobbies(data.userData.hobbies.split(','));
     }
 
     const fetchImageUrls = async () => {
@@ -61,15 +61,19 @@ function ProfileCard() {
         <Box>
             <h2>This is the user profile page</h2>
 
-            <Card sx={{ maxWidth: 500 }}>
+            <Card sx={{ width: '500px' }}>
                 <CardContent>
                     <Typography gutterBottom variant="h5" component="div">
                         {`${firstName} ${lastName}`}
                     </Typography>
-                    <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-                        {hobbies}
-                    </Typography>
-                    <Typography variant="body2" sx={{ color: 'text.secondary', fontSize:'18px' }}>
+                    
+                    <Stack direction={'row'} spacing={2} sx={{display:'flex', justifyContent:'center'}}>
+                        {hobbies.map((hobby, index) => (
+                            <Chip label={hobby} key={index} />
+                        ))}
+                    </Stack>
+
+                    <Typography variant="body2" sx={{ color: 'text.secondary', fontSize:'18px', marginTop:'15px' }}>
                         {bio}
                     </Typography>
                 </CardContent>

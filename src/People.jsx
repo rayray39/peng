@@ -3,7 +3,7 @@ import ProfileCard from "./ProfileCard"
 
 // page to browse through other people's profiles, explore page
 function People() {
-    return <Box>
+    return <Box sx={{display:'flex', justifyContent:'center'}}>
         <ProfileCard />
     </Box>
 }
