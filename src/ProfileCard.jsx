@@ -27,8 +27,8 @@ function ProfileCard() {
 
         console.log(data.message);
         // set state variables
-        setFirstName(data.userData.firstName);
-        setLastName(data.userData.lastName);
+        setFirstName(data.userData.firstName[0].toUpperCase() + data.userData.firstName.slice(1));
+        setLastName(data.userData.lastName[0].toUpperCase() + data.userData.lastName.slice(1));
         setBio(data.userData.bio);
         setHobbies(data.userData.hobbies);
     }
