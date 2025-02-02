@@ -59,6 +59,14 @@ function ProfileCard() {
         fetchImageUrls();
     }, [])
 
+    const handleLike = () => {
+        console.log('like button is clicked');
+    }
+
+    const handlePass = () => {
+        console.log('pass button is clicked');
+    }
+
     return (
         <Box>
             <h2>This is the user profile page</h2>
@@ -80,7 +88,7 @@ function ProfileCard() {
                     </Typography>
                 </CardContent>
                 <CardActions sx={{display:'flex', justifyContent:'space-between', margin:'10px'}}>
-                    <Button variant="outlined" disableElevation size="large" 
+                    <Button variant="outlined" disableElevation size="large" onClick={handlePass}
                         sx={{color:'orange', borderColor:'orange',
                             "&:hover": {
                                 backgroundColor: "orange",
@@ -90,7 +98,7 @@ function ProfileCard() {
                             Pass ❌
                     </Button>
 
-                    <Button variant="outlined" disableElevation size="large" 
+                    <Button variant="outlined" disableElevation size="large" onClick={handleLike}
                         sx={{color:'orange', borderColor:'orange',
                             "&:hover": {
                                 backgroundColor: "orange",
