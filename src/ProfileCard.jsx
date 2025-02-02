@@ -11,6 +11,7 @@ function ProfileCard() {
     const [hobbies, setHobbies] = useState([]);         // comma separated string
     const [imageUrls, setImageUrls] = useState([]);
 
+    // fetch current logged in user's data (firstName, lastName, bio, hobbies)
     const fetchUserData = async () => {
         const response = await fetch(`http://localhost:5000/${currentUser.id}/data`, {
             method:'GET',
@@ -33,6 +34,7 @@ function ProfileCard() {
         setHobbies(data.userData.hobbies.split(','));
     }
 
+    // fetch currently logged in user's image urls
     const fetchImageUrls = async () => {
         const response = await fetch(`http://localhost:5000/${currentUser.id}/data-imageUrls`, {
             method:'GET',
