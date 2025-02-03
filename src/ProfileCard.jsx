@@ -1,4 +1,4 @@
-import { Box, Stack, Card, CardActions, CardContent, Typography, Button, Chip } from "@mui/material"
+import { Box, Stack, Card, CardActions, CardContent, Typography, Button, Chip, ImageList, ImageListItem } from "@mui/material"
 import { useUser } from "./UserContext"
 import { useEffect, useState } from "react";
 
@@ -73,6 +73,21 @@ function ProfileCard() {
 
             <Card sx={{ width: '500px' }}>
                 <CardContent>
+                    {
+                        <ImageList>
+                            {imageUrls.map((imageUrl, index) => (
+                            <ImageListItem key={index}>
+                                <img
+                                    srcSet={imageUrl}
+                                    src={imageUrl}
+                                    loading="lazy"
+                                    alt={`profile image-${index}`}
+                                />
+                                </ImageListItem>
+                            ))}
+                        </ImageList>
+                    }
+
                     <Typography gutterBottom variant="h5" component="div">
                         {`${firstName} ${lastName}`}
                     </Typography>
