@@ -260,6 +260,57 @@ app.post("/upload-to-cloud", upload.array("images", 3), async (req, res) => {
     }
 });
 
+// returns all the data (firstName, lastName, bio, hobbies) about the currently logged in user
+app.get('/:user_id/data', (req, res) => {
+    const userId = req.params.user_id;
+
+    if (!userId) {
+        return res.status(400).json({ error: 'Missing user id.' });
+    }
+
+    const query = 'SELECT firstName, lastName, bio, hobbies FROM users WHERE id = ?';
+
+    db.get(query, [userId], (err, row) => {
+        if (err) {
+            console.error("Database query error:", err);
+            return res.status(500).json({ error: "Unable to retrieve user data." });
+        }
+
+        if (!row) {
+            return res.status(404).json({ error: "User not found" });
+        }
+
+        res.status(200).json({ userData: row, message: 'Successfully retrieved user data.' });
+    })
+})
+
+// returns all the imageUrls uploaded by the currently logged in user
+app.get('/:user_id/data-imageUrls', (req, res) => {
+    const userId = req.params.user_id;
+
+    if (!userId) {
+        return res.status(400).json({ error: 'Missing user id.' });
+    }
+
+    const query = 'SELECT image_url FROM user_images WHERE user_id = ?';
+
+    db.all(query, [userId], (err, rows) => {
+        if (err) {
+            console.error("Database query error:", err);
+            return res.status(500).json({ error: "Unable to retrieve user image urls." });
+        }
+
+        if (!rows) {
+            return res.status(404).json({ error: "User not found" });
+        }
+
+        // Extract just the image URLs from the result set
+        const imageUrls = rows.map(row => row.image_url);
+
+        res.status(200).json({ imageUrls: imageUrls, message: 'Successfully retrieved user image urls.' });
+    })
+})
+
 // returns all users in the database
 app.get('/all-users', (req, res) => {
     const query = "SELECT * FROM users";

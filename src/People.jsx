@@ -1,12 +1,11 @@
 import { Box } from "@mui/material"
+import ProfileCard from "./ProfileCard"
 
-// page to browser through other people's profiles, explore page
+// page to browse through other people's profiles, explore page
 function People() {
-    return (
-        <Box>
-            <h2>This is the people page</h2>
-        </Box>
-    )
+    return <Box sx={{display:'flex', justifyContent:'center'}}>
+        <ProfileCard />
+    </Box>
 }
 
 export default People

@@ -78,7 +78,7 @@ function Login() {
 
         console.log(`currently logged in user: ${data.user.username}`);
 
-        navigate('/fill-in-bio');       // navigate to FillBio if successfully logged in.
+        navigate('/people');       // navigate to People page if successfully logged in.
     }
 
     const getCurrentUser = () => {
