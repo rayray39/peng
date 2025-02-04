@@ -1,10 +1,9 @@
 import { Box, Stack, Card, CardActions, CardContent, Typography, Button, Chip, ImageList, ImageListItem } from "@mui/material"
-import { useUser } from "./UserContext"
 import { useEffect, useState } from "react";
 
 // display user information as a card
-function ProfileCard() {
-    const { currentUser } = useUser();
+function ProfileCard({ userId, index }) {
+    // const { currentUser } = useUser();
     const [firstName, setFirstName] = useState('');
     const [lastName, setLastName] = useState('');
     const [bio, setBio] = useState('');
@@ -13,7 +12,7 @@ function ProfileCard() {
 
     // fetch current logged in user's data (firstName, lastName, bio, hobbies)
     const fetchUserData = async () => {
-        const response = await fetch(`http://localhost:5000/${currentUser.id}/data`, {
+        const response = await fetch(`http://localhost:5000/${userId}/data`, {
             method:'GET',
             headers: {
                 'Content-Type':'application/json',
@@ -36,7 +35,7 @@ function ProfileCard() {
 
     // fetch currently logged in user's image urls
     const fetchImageUrls = async () => {
-        const response = await fetch(`http://localhost:5000/${currentUser.id}/data-imageUrls`, {
+        const response = await fetch(`http://localhost:5000/${userId}/data-imageUrls`, {
             method:'GET',
             headers: {
                 'Content-Type':'application/json',
@@ -68,9 +67,7 @@ function ProfileCard() {
     }
 
     return (
-        <Box>
-            <h2>This is the user profile page</h2>
-
+        <Box key={index}>
             <Card sx={{ width: '500px' }}>
                 <CardContent>
                     {
