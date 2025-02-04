@@ -1,5 +1,4 @@
 import { Box, Stack, Card, CardActions, CardContent, Typography, Button, Chip, ImageList, ImageListItem } from "@mui/material"
-import { useUser } from "./UserContext"
 import { useEffect, useState } from "react";
 
 // display user information as a card
