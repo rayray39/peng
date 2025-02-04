@@ -2,7 +2,7 @@ import { Box, Stack, Card, CardActions, CardContent, Typography, Button, Chip, I
 import { useEffect, useState } from "react";
 
 // display user information as a card
-function ProfileCard({ userId }) {
+function ProfileCard({ userId, index }) {
     // const { currentUser } = useUser();
     const [firstName, setFirstName] = useState('');
     const [lastName, setLastName] = useState('');
@@ -67,7 +67,7 @@ function ProfileCard({ userId }) {
     }
 
     return (
-        <Box>
+        <Box key={index}>
             <Card sx={{ width: '500px' }}>
                 <CardContent>
                     {

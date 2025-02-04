@@ -311,6 +311,24 @@ app.get('/:user_id/data-imageUrls', (req, res) => {
     })
 })
 
+// returns all user ids in the database
+app.get('/all-userIds', (req, res) => {
+    const query = "SELECT * FROM users";
+
+    db.all(query, [], (err, rows) => {
+        if (err) {
+            console.error("Error retrieving user IDs:", err);
+            return res.status(500).json({ error: "Database error." });
+        }
+
+        // Extract just the ids from the result set
+        const rowIds = rows.map(row => row.id);
+
+        // Respond with all user ids as JSON
+        res.status(200).json({ userIds: rowIds });
+    })
+})
+
 // returns all users in the database
 app.get('/all-users', (req, res) => {
     const query = "SELECT * FROM users";
