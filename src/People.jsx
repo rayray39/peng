@@ -1,9 +1,11 @@
 import { Box, Stack } from "@mui/material"
 import ProfileCard from "./ProfileCard"
 import { useEffect, useState } from "react"
+import { useUser } from "./UserContext";
 
 // page to browse through other people's profiles, explore page
 function People() {
+    const { currentUser } = useUser();
     const [allUsers, setAllUsers] = useState([]);
 
     // fetch all user ids in the database
@@ -23,7 +25,7 @@ function People() {
         }
 
         console.log(data.message);
-        setAllUsers(data.userIds);
+        setAllUsers(data.userIds.filter((userId) => userId !== currentUser.id));
     }
 
     useEffect(() => {
@@ -32,11 +34,11 @@ function People() {
 
     return <Box sx={{display:'flex', justifyContent:'center'}}>
         <Stack spacing={2}>
-            <h2>This is the people page.</h2>
+            <h2>Find your true love 💕</h2>
             
             {
                 allUsers.map((userId, index) => (
-                    <ProfileCard key={index} userId={userId} index={index} />
+                    <ProfileCard key={index} userId={userId} />
                 ))
             }
         </Stack>
