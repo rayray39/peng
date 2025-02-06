@@ -99,6 +99,29 @@ function AddImages() {
         console.log(data.message);
     }
 
+    // to get images from Cloundinary and save to database for new user (fake account)
+    const cloudImageUrls = [
+        'https://res.cloudinary.com/dol0cr1cs/image/upload/v1738250318/samples/upscale-face-1.jpg',
+        'https://res.cloudinary.com/dol0cr1cs/image/upload/v1738250317/samples/outdoor-woman.jpg',
+        'https://res.cloudinary.com/dol0cr1cs/image/upload/v1738250309/samples/animals/three-dogs.jpg'
+    ];
+    const handleGetCloudImages = async () => {
+        console.log('get cloud button is clicked');
+
+        const response = await fetch('http://localhost:5000/get-from-cloud', {
+            method:"POST",
+            headers:{
+                'Content-Type':'application/json',
+            },
+            body: JSON.stringify({ currentUser, cloudImageUrls }),
+        })
+
+        const data = await response.json();
+        setImageUrls(data.imageUrls);
+        console.log(data.message);
+        console.log('Uploaded image URLs:', data.imageUrls);
+    }
+
     const VisuallyHiddenInput = styled('input')({
         clip: 'rect(0 0 0 0)',
         clipPath: 'inset(50%)',
@@ -180,7 +203,8 @@ function AddImages() {
                     {uploadImagesLoading && <CircularProgress />}
                 </Box>
 
-                {/* <button onClick={deleteAllImages}>delete all images</button> */}
+                {/* <button onClick={deleteAllImages}>delete all images</button>
+                <button onClick={handleGetCloudImages}>get three images</button> */}
             </Stack>
         </Box>
     )

@@ -383,6 +383,33 @@ app.delete('/delete-all-images', (req, res) => {
     })
 })
 
+// for creating fake accounts, by fetching images directly from Cloudinary and inserting into database
+app.post('/get-from-cloud', (req, res) => {
+    const { currentUser, cloudImageUrls } = req.body;
+
+    if (!currentUser) {
+        return res.status(400).json({ error:"User not logged in" });
+    }
+    if (!cloudImageUrls) {
+        return res.status(400).json({ error:"No cloud urls." });
+    }
+
+    const userId = currentUser.id;
+
+     // Insert uploaded image URLs into SQLite
+     const insertQuery = 'INSERT INTO user_images (user_id, image_url) VALUES (?, ?)';
+
+     db.serialize(() => {
+        const stmt = db.prepare(insertQuery);
+        cloudImageUrls.forEach(url => {
+            stmt.run(userId, url);
+        });
+        stmt.finalize();
+    });
+
+    return res.status(200).json({ message: "Images uploaded (fake) successfully", cloudImageUrls });
+})
+
 
 // Start the server
 app.listen(PORT, () => {
