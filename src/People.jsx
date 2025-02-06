@@ -33,7 +33,7 @@ function People() {
     }, [])
 
     return <Box sx={{display:'flex', justifyContent:'center'}}>
-        <Stack spacing={2}>
+        <Stack>
             <h2>Find your true love 💕</h2>
             
             {

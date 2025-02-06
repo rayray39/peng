@@ -3,7 +3,6 @@ import { useEffect, useState } from "react";
 
 // display user information as a card
 function ProfileCard({ userId }) {
-    // const { currentUser } = useUser();
     const [firstName, setFirstName] = useState('');
     const [lastName, setLastName] = useState('');
     const [bio, setBio] = useState('');
