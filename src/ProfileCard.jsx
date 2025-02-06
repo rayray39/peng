@@ -68,7 +68,7 @@ function ProfileCard({ userId }) {
 
     return (
         <Box>
-            <Card sx={{ width: '500px' }}>
+            <Card sx={{ width: '500px', maxHeight:'800px' }}>
                 <CardContent>
                     {
                         <ImageList>
