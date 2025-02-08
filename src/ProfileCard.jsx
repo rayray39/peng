@@ -2,7 +2,7 @@ import { Box, Stack, Card, CardActions, CardContent, Typography, Button, Chip, I
 import { useEffect, useState } from "react";
 
 // display user information as a card
-function ProfileCard({ userId }) {
+function ProfileCard({ userId, handleNextCard, handlePreviousCard }) {
     const [firstName, setFirstName] = useState('');
     const [lastName, setLastName] = useState('');
     const [bio, setBio] = useState('');
@@ -59,20 +59,22 @@ function ProfileCard({ userId }) {
 
     const handleLike = () => {
         console.log('like button is clicked');
+        handleNextCard();
     }
 
     const handlePass = () => {
         console.log('pass button is clicked');
+        handlePreviousCard();
     }
 
     return (
-        <Box>
-            <Card sx={{ width: '500px', maxHeight:'800px' }}>
+        <Box sx={{display:'flex', justifyContent:'center', transform: "translate(0%, 20%)"}}>
+            <Card sx={{ maxHeight:'800px', maxWidth:'600px' }}>
                 <CardContent>
                     {
-                        <ImageList>
+                        <ImageList sx={{display:'flex', justifyContent:'center', minHeight:'200px',maxHeight:'300px', maxWidth:'500px'}}>
                             {imageUrls.map((imageUrl, index) => (
-                            <ImageListItem key={index}>
+                            <ImageListItem key={index} sx={{width:'300px'}}>
                                 <img
                                     srcSet={imageUrl}
                                     src={imageUrl}
