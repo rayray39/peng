@@ -38,9 +38,20 @@ function People() {
         fetchAllUsers();
     }, [])
 
-    const handleNextCard = () => {
-        // when the like/pass button in the profile card is clicked
+    const handleUserLiked = (userId) => {
+        // when the like button in the profile card is clicked
         setCurrentDisplayed((currentDisplayed + 1) % numOfUsers);
+
+        console.log(`current user id = ${currentUser.id}`);
+        console.log(`user id that has been liked = ${userId}`);
+    }
+
+    const handleUserPassed = (userId) => {
+        // when the pass button in the profile card is clicked
+        setCurrentDisplayed((currentDisplayed + 1) % numOfUsers);
+
+        console.log(`current user id = ${currentUser.id}`);
+        console.log(`user id that has been passed = ${userId}`);
     }
 
     return <Box sx={{display:'flex', justifyContent:'center', transform: "translate(0%, 20%)"}}>
@@ -49,7 +60,10 @@ function People() {
         {
             allUsers.map((userId, index) => (
                 <Box key={index} sx={{position:'absolute', display: userId === allUsers[currentDisplayed] ? 'block' : 'none'}}>
-                    <ProfileCard userId={userId} handleNextCard={handleNextCard} />
+                    <ProfileCard userId={userId} 
+                        handleUserLiked={() => handleUserLiked(userId)} 
+                        handleUserPassed={() => handleUserPassed(userId)} 
+                    />
                 </Box>
             ))
         }
