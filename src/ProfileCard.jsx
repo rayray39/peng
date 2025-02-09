@@ -2,7 +2,7 @@ import { Box, Stack, Card, CardActions, CardContent, Typography, Button, Chip, I
 import { useEffect, useState } from "react";
 
 // display user information as a card
-function ProfileCard({ userId, handleNextCard, handlePreviousCard }) {
+function ProfileCard({ userId, handleNextCard }) {
     const [firstName, setFirstName] = useState('');
     const [lastName, setLastName] = useState('');
     const [bio, setBio] = useState('');
@@ -64,7 +64,7 @@ function ProfileCard({ userId, handleNextCard, handlePreviousCard }) {
 
     const handlePass = () => {
         console.log('pass button is clicked');
-        handlePreviousCard();
+        handleNextCard();
     }
 
     return (
