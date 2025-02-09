@@ -1,4 +1,4 @@
-import { Box, Stack } from "@mui/material"
+import { Box } from "@mui/material"
 import ProfileCard from "./ProfileCard"
 import { useEffect, useState } from "react"
 import { useUser } from "./UserContext";

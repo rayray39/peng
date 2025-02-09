@@ -62,7 +62,7 @@ function ProfileCard({ userId, handleUserLiked, handleUserPassed }) {
         handleUserLiked();
     }
 
-    const handlePass = (userId) => {
+    const handlePass = () => {
         console.log('pass button is clicked');
         handleUserPassed();
     }
