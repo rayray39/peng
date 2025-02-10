@@ -71,13 +71,33 @@ const db = new sqlite3.Database(dbPath, (err) => {
                 FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
             )
         `, (err) => {
-            if (err) {
-                console.error("Error creating user_images table:", err.message);
-            } else {
-                console.log("user_images table created or already exists.");
-            }
+                if (err) {
+                    console.error("Error creating user_images table:", err.message);
+                } else {
+                    console.log("user_images table created or already exists.");
+                }
         });
     });
+
+    // Create a 'user_likes' table to keep track of the user_ids that were liked by a user
+    db.serialize(() => {
+        db.run(
+            `CREATE TABLE IF NOT EXISTS user_likes (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            user_id INTEGER NOT NULL,
+            liked_user_id INTEGER NOT NULL,
+            FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+            FOREIGN KEY (liked_user_id) REFERENCES users(id)
+            )`,
+            (err) => {
+                if (err) {
+                    console.error("Error creating user_likes table:", err);
+                } else {
+                    console.log("user_likes table created or already exists.");
+                }
+            }
+        )
+    })
 });
 
 // create a new user account - add new row of user data into database
@@ -408,6 +428,54 @@ app.post('/get-from-cloud', (req, res) => {
     });
 
     return res.status(200).json({ message: "Images uploaded (fake) successfully", cloudImageUrls });
+})
+
+// adds likedUserId to the list of liked user ids of the current user
+app.post('/like-user', (req, res) => {
+    const { currentUser, likedUserId } = req.body;
+
+    if (!currentUser) {
+        return res.status(400).json({ error:"User not logged in" });
+    }
+    if (!likedUserId) {
+        return res.status(400).json({ error:"No liked user id." });
+    }
+
+    const query = 'INSERT INTO user_likes (user_id, liked_user_id) VALUES (?, ?)'
+
+    db.run(query, [currentUser.id, likedUserId], function (err) {
+        if (err) {
+            console.error("Error adding liked_used_id to user_likes:", err);
+            return res.status(500).json({ error: "Database error." });
+        }
+    
+        res.status(200).json({
+            message: "Successfully added likedUserId to currentUser's list.",
+        });
+    })
+})
+
+// gets all the liked user ids of a user
+app.get('/:userId/liked-users', (req, res) => {
+    const userId = req.params.userId;
+
+    if (!userId) {
+        return res.status(400).json({ error: 'Missing user id.' });
+    }
+
+    const query = 'SELECT liked_user_id FROM user_likes WHERE user_id = ?';
+
+    db.all(query, [userId], function (err, rows) {
+        if (err) {
+            console.error(`Error retrieving liked_used_ids for userId: ${userId}:`, err);
+            return res.status(500).json({ error: "Database error." });
+        }
+    
+        res.status(200).json({
+            userId: userId,
+            likedUserIds: rows
+        });
+    })
 })
 
 

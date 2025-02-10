@@ -38,19 +38,38 @@ function People() {
         fetchAllUsers();
     }, [])
 
+    // adds the likedUserId to the list of userIds that have been liked by current user 
+    const likeUser = async (likedUserId) => {
+        const response = await fetch('http://localhost:5000/like-user', {
+            method:'POST',
+            headers: {
+                'Content-Type':'application/json',
+            },
+            body: JSON.stringify({ currentUser, likedUserId }),
+        })
+
+        const data = await response.json();
+
+        if (!response.ok) {
+            console.log(data.error);
+            return;
+        }
+
+        console.log(data.message);
+    }
+
     const handleUserLiked = (userId) => {
         // when the like button in the profile card is clicked
         setCurrentDisplayed((currentDisplayed + 1) % numOfUsers);
 
-        console.log(`current user id = ${currentUser.id}`);
         console.log(`user id that has been liked = ${userId}`);
+        likeUser(userId);
     }
 
     const handleUserPassed = (userId) => {
         // when the pass button in the profile card is clicked
         setCurrentDisplayed((currentDisplayed + 1) % numOfUsers);
 
-        console.log(`current user id = ${currentUser.id}`);
         console.log(`user id that has been passed = ${userId}`);
     }
 
