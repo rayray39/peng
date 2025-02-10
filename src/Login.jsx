@@ -94,7 +94,7 @@ function Login() {
         <Stack direction='column' spacing={2} sx={{width: '500px'}}>
             <h2>Log In To Your Account</h2>
 
-            <TextField id="login-username" label='Username' variant="outlined"
+            <TextField id="login-username" label='Username' variant="outlined" autoFocus
                 value={username} onChange={handleUsername} error={usernameEmpty} helperText={usernameEmpty ? fieldIsEmpty : null}/>
 
             <TextField id="login-password" label='Password' variant="outlined" type="password"

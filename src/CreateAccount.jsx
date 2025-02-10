@@ -116,7 +116,7 @@ function CreateAccount() {
         }}>
             <Stack direction='column' spacing={2} sx={{width: '500px'}}>
                 <h2>Create Your Account</h2>
-                <TextField id="create-firstname" label='First Name' variant="outlined" error={firstNameEmpty} 
+                <TextField id="create-firstname" label='First Name' variant="outlined" error={firstNameEmpty} autoFocus
                     helperText={firstNameEmpty ? fieldIsEmpty : null} value={firstName} onChange={handleFirstName}/>
 
                 <TextField id="create-lastname" label='Last Name' variant="outlined" error={lastNameEmpty} 
