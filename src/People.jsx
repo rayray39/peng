@@ -1,10 +1,17 @@
-import { Box, Stack } from "@mui/material"
+import { Box } from "@mui/material"
 import ProfileCard from "./ProfileCard"
 import { useEffect, useState } from "react"
+import { useUser } from "./UserContext";
 
 // page to browse through other people's profiles, explore page
 function People() {
+    const { currentUser } = useUser();
     const [allUsers, setAllUsers] = useState([]);
+    
+    // keeps track of the current card to display
+    const [currentDisplayed, setCurrentDisplayed] = useState(0);
+    // keeps track of the num of user ids retrieved from the database
+    const [numOfUsers, setNumOfUsers] = useState(0);
 
     // fetch all user ids in the database
     const fetchAllUsers = async () => {
@@ -23,23 +30,62 @@ function People() {
         }
 
         console.log(data.message);
-        setAllUsers(data.userIds);
+        setAllUsers(data.userIds.filter((userId) => userId !== currentUser.id));
+        setNumOfUsers(data.userIds.length - 1); // data.userIds contain the currently logged in user's id too
     }
 
     useEffect(() => {
         fetchAllUsers();
     }, [])
 
-    return <Box sx={{display:'flex', justifyContent:'center'}}>
-        <Stack spacing={2}>
-            <h2>This is the people page.</h2>
-            
-            {
-                allUsers.map((userId, index) => (
-                    <ProfileCard key={index} userId={userId} index={index} />
-                ))
-            }
-        </Stack>
+    // adds the likedUserId to the list of userIds that have been liked by current user 
+    const likeUser = async (likedUserId) => {
+        const response = await fetch('http://localhost:5000/like-user', {
+            method:'POST',
+            headers: {
+                'Content-Type':'application/json',
+            },
+            body: JSON.stringify({ currentUser, likedUserId }),
+        })
+
+        const data = await response.json();
+
+        if (!response.ok) {
+            console.log(data.error);
+            return;
+        }
+
+        console.log(data.message);
+    }
+
+    const handleUserLiked = (userId) => {
+        // when the like button in the profile card is clicked
+        setCurrentDisplayed((currentDisplayed + 1) % numOfUsers);
+
+        console.log(`user id that has been liked = ${userId}`);
+        likeUser(userId);
+    }
+
+    const handleUserPassed = (userId) => {
+        // when the pass button in the profile card is clicked
+        setCurrentDisplayed((currentDisplayed + 1) % numOfUsers);
+
+        console.log(`user id that has been passed = ${userId}`);
+    }
+
+    return <Box sx={{display:'flex', justifyContent:'center', transform: "translate(0%, 20%)"}}>
+        <h2>Find your true love 💕</h2>
+        
+        {
+            allUsers.map((userId, index) => (
+                <Box key={index} sx={{position:'absolute', display: userId === allUsers[currentDisplayed] ? 'block' : 'none'}}>
+                    <ProfileCard userId={userId} 
+                        handleUserLiked={() => handleUserLiked(userId)} 
+                        handleUserPassed={() => handleUserPassed(userId)} 
+                    />
+                </Box>
+            ))
+        }
     </Box>
 }
 
