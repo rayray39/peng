@@ -478,6 +478,28 @@ app.get('/:userId/liked-users', (req, res) => {
     })
 })
 
+// delete the list of liked user ids from logged in user, for debugging
+app.delete('/:userId/delete-liked-users', (req, res) => {
+    const userId = req.params.userId;
+
+    if (!userId) {
+        return res.status(400).json({ error: 'Missing user id.' });
+    }
+
+    const query = 'DELETE FROM user_likes WHERE user_id = ?';
+
+    db.run(query, [userId], function (err) {
+        if (err) {
+            console.error("Error deleting liked user ids:", err);
+            return res.status(500).json({ error: "Database error." });
+        }
+    
+        res.status(200).json({
+            message: "Liked user ids deleted successfully!",
+        });
+    })
+})
+
 
 // Start the server
 app.listen(PORT, () => {

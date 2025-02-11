@@ -1,4 +1,4 @@
-import { Box } from "@mui/material"
+import { Box, Button } from "@mui/material"
 import ProfileCard from "./ProfileCard"
 import { useEffect, useState } from "react"
 import { useUser } from "./UserContext";
@@ -73,7 +73,27 @@ function People() {
         console.log(`user id that has been passed = ${userId}`);
     }
 
-    return <Box sx={{display:'flex', justifyContent:'center', transform: "translate(0%, 20%)"}}>
+    // for debugging, to delete the liked userIds of currentUser
+    const deleteLikedUsers = async () => {
+        console.log('delete users button clicked')
+        const response = await fetch(`http://localhost:5000/${currentUser.id}/delete-liked-users`, {
+            method:'DELETE',
+            headers: {
+                'Content-Type':'application/json',
+            },
+        })
+
+        const data = await response.json();
+
+        if (!response.ok) {
+            console.log(data.error);
+            return;
+        }
+
+        console.log(data.message);
+    }
+
+    return (<Box sx={{display:'flex', justifyContent:'center', transform: "translate(0%, 20%)"}}>
         <h2>Find your true love 💕</h2>
         
         {
@@ -86,7 +106,7 @@ function People() {
                 </Box>
             ))
         }
-    </Box>
+    </Box>)
 }
 
 export default People
