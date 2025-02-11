@@ -15,7 +15,11 @@ function MatchModal({ open, close }) {
         display:'flex',
         alignItems:'center',
         flexDirection:'column'
-      };
+    };
+
+    const handleSendMessage = () => {
+        console.log('send message button clicked');
+    }
 
     return (
         <Modal
@@ -32,12 +36,10 @@ function MatchModal({ open, close }) {
                     Sent a message or continue swiping.
                 </Typography>
 
-                <Button variant="outlined" disableElevation size="medium"
-                        sx={{color:'orange', borderColor:'orange',
-                            "&:hover": {
-                                backgroundColor: "orange",
-                                color: 'white',
-                            },
+                <Button variant="outlined" disableElevation size="medium" onClick={handleSendMessage}
+                        sx={{color:'white', 
+                            borderColor:'orange', 
+                            backgroundColor:'orange',
                             marginTop:'20px'
                         }}>
                     Sent Message
