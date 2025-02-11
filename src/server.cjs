@@ -87,7 +87,8 @@ const db = new sqlite3.Database(dbPath, (err) => {
             user_id INTEGER NOT NULL,
             liked_user_id INTEGER NOT NULL,
             FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
-            FOREIGN KEY (liked_user_id) REFERENCES users(id)
+            FOREIGN KEY (liked_user_id) REFERENCES users(id),
+            UNIQUE (user_id, liked_user_id)
             )`,
             (err) => {
                 if (err) {
@@ -97,7 +98,20 @@ const db = new sqlite3.Database(dbPath, (err) => {
                 }
             }
         )
-    })
+    });
+
+    // db.serialize(() => {
+    //     db.run(
+    //         `DROP TABLE user_likes`,
+    //         (err) => {
+    //             if (err) {
+    //                 console.error("Error dropping user_likes table:", err);
+    //             } else {
+    //                 console.log("user_likes table dropped.");
+    //             }
+    //         }
+    //     )
+    // })
 });
 
 // create a new user account - add new row of user data into database
@@ -444,6 +458,9 @@ app.post('/like-user', (req, res) => {
     const query = 'INSERT INTO user_likes (user_id, liked_user_id) VALUES (?, ?)'
 
     db.run(query, [currentUser.id, likedUserId], function (err) {
+        if (err.code === "SQLITE_CONSTRAINT") {
+            return res.status(400).json({ error: `userId: ${likedUserId} already liked by ${currentUser.username}` });
+        }
         if (err) {
             console.error("Error adding liked_used_id to user_likes:", err);
             return res.status(500).json({ error: "Database error." });
