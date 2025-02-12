@@ -5,7 +5,9 @@ const path = require('path');                   // for working with files and di
 const cors = require('cors');
 const sqlite3 = require("sqlite3").verbose();   // sqlite3 database
 const dbPath = path.resolve(__dirname, '../data/database.db'); // Adjust 'database.db' as needed
+const jwt = require("jsonwebtoken");            // for authentication
 
+// for Cloudinary image uploads
 const multer = require("multer");
 const { Readable } = require("stream");
 const cloudinary = require("cloudinary").v2;
@@ -114,7 +116,7 @@ const db = new sqlite3.Database(dbPath, (err) => {
     // })
 });
 
-// create a new user account - add new row of user data into database
+// create a new user account - add new row of user data into database (public endpoint)
 app.post("/create-new-account", (req, res) => {
     const { firstName, lastName, username, password } = req.body;
 
@@ -146,7 +148,7 @@ app.post("/create-new-account", (req, res) => {
     });
 });
 
-// retrieves user credentials from client-side, verfiy them, returns back the logged in user
+// retrieves user credentials from client-side, verfiy them, returns back the logged in user (public endpoint)
 app.post("/log-user-in", (req, res) => {
     const { username, password } = req.body;
 

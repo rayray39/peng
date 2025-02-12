@@ -9,6 +9,14 @@ import AddImages from './AddImages';
 import People from './People';
 
 function App() {
+    // user can only access the route if authenticated
+    const [isAuthenticated, setIsAuthenticated] = useState(false);
+
+    useEffect(() => {
+        const token = localStorage.getItem("authToken");
+        setIsAuthenticated(!!token); // Set true if token exists
+    }, []);
+
     return <>
         <Router>
             <Routes>
@@ -18,7 +26,7 @@ function App() {
                 <Route path="/fill-in-bio" element={<FillBio />} />
                 <Route path='/select-hobbies' element={<Hobbies/>}/>
                 <Route path='/add-images' element={<AddImages/>}/>
-                <Route path='/people' element={<People/>}/>
+                <Route path='/people' element={isAuthenticated ? <People /> : <Navigate to="/login" />}/>
             </Routes>
         </Router>
     </>
