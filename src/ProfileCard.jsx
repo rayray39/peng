@@ -1,6 +1,5 @@
 import { Box, Stack, Card, CardActions, CardContent, Typography, Button, Chip, ImageList, ImageListItem } from "@mui/material"
 import { useEffect, useState } from "react";
-import MatchModal from "./MatchModal";
 
 // display user information as a card
 function ProfileCard({ userId, handleUserLiked, handleUserPassed, thereIsAMatch }) {
