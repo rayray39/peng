@@ -3,14 +3,12 @@ import { useEffect, useState } from "react";
 import MatchModal from "./MatchModal";
 
 // display user information as a card
-function ProfileCard({ userId, handleUserLiked, handleUserPassed }) {
+function ProfileCard({ userId, handleUserLiked, handleUserPassed, thereIsAMatch }) {
     const [firstName, setFirstName] = useState('');
     const [lastName, setLastName] = useState('');
     const [bio, setBio] = useState('');
     const [hobbies, setHobbies] = useState([]);         // comma separated string
     const [imageUrls, setImageUrls] = useState([]);
-
-    const [itsAMatch, setItsAMatch] = useState(false);  // if there is a match, it will open the MatchModal
 
     // fetch current logged in user's data (firstName, lastName, bio, hobbies)
     const fetchUserData = async () => {
@@ -68,13 +66,10 @@ function ProfileCard({ userId, handleUserLiked, handleUserPassed }) {
     const handlePass = () => {
         console.log('pass button is clicked');
         handleUserPassed();
-
-        setItsAMatch(true);
     }
 
     return (
         <Box sx={{display:'flex', justifyContent:'center', transform: "translate(0%, 20%)"}}>
-            <MatchModal open={itsAMatch} close={() => setItsAMatch(false)}/>
 
             <Card sx={{ maxHeight:'800px', maxWidth:'600px' }}>
                 <CardContent>

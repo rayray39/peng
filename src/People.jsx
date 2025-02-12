@@ -1,5 +1,6 @@
 import { Box, Button } from "@mui/material"
 import ProfileCard from "./ProfileCard"
+import MatchModal from "./MatchModal";
 import { useEffect, useState } from "react"
 import { useUser } from "./UserContext";
 
@@ -12,6 +13,9 @@ function People() {
     const [currentDisplayed, setCurrentDisplayed] = useState(0);
     // keeps track of the num of user ids retrieved from the database
     const [numOfUsers, setNumOfUsers] = useState(0);
+
+    // if there is a match, the modal will open
+    const [thereIsAMatch, setThereIsAMatch] = useState(false);
 
     // fetch all user ids in the database
     const fetchAllUsers = async () => {
@@ -57,7 +61,7 @@ function People() {
 
         console.log(data.message);
         if (data.likesEachOther) {
-            alert("It's a Match!")
+            setThereIsAMatch(true);
         }
     }
 
@@ -98,6 +102,8 @@ function People() {
 
     return (<Box sx={{display:'flex', justifyContent:'center', transform: "translate(0%, 20%)"}}>
         <h2>Find your true love 💕</h2>
+
+        <MatchModal open={thereIsAMatch} close={() => setThereIsAMatch(false)}/>
         
         {
             allUsers.map((userId, index) => (
@@ -105,6 +111,7 @@ function People() {
                     <ProfileCard userId={userId} 
                         handleUserLiked={() => handleUserLiked(userId)} 
                         handleUserPassed={() => handleUserPassed(userId)} 
+                        thereIsAMatch={thereIsAMatch}
                     />
                 </Box>
             ))
