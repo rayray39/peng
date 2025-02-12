@@ -56,6 +56,9 @@ function People() {
         }
 
         console.log(data.message);
+        if (data.likesEachOther) {
+            alert("It's a Match!")
+        }
     }
 
     const handleUserLiked = (userId) => {

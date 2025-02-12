@@ -462,10 +462,10 @@ app.post('/like-user', (req, res) => {
     const checkMutualLikeQuery = `SELECT 1 FROM user_likes WHERE user_id = ? AND liked_user_id = ?`;
 
     db.run(insertQuery, [currentUser.id, likedUserId], function (err) {
-        if (err.code === "SQLITE_CONSTRAINT") {
-            return res.status(400).json({ error: `userId: ${likedUserId} already liked by ${currentUser.username}` });
-        }
         if (err) {
+            if (err.code === 'SQL_CONSTRAINT') {
+                return res.status(400).json({ error: `userId: ${likedUserId} already liked by ${currentUser.username}` });
+            }
             console.error("Error adding liked_used_id to user_likes:", err);
             return res.status(500).json({ error: "Database error." });
         }
