@@ -2,7 +2,7 @@ import { Box, Stack, Card, CardActions, CardContent, Typography, Button, Chip, I
 import { useEffect, useState } from "react";
 
 // display user information as a card
-function ProfileCard({ userId, handleUserLiked, handleUserPassed }) {
+function ProfileCard({ userId, handleUserLiked, handleUserPassed, thereIsAMatch }) {
     const [firstName, setFirstName] = useState('');
     const [lastName, setLastName] = useState('');
     const [bio, setBio] = useState('');
@@ -69,6 +69,7 @@ function ProfileCard({ userId, handleUserLiked, handleUserPassed }) {
 
     return (
         <Box sx={{display:'flex', justifyContent:'center', transform: "translate(0%, 20%)"}}>
+
             <Card sx={{ maxHeight:'800px', maxWidth:'600px' }}>
                 <CardContent>
                     {

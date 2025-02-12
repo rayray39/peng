@@ -1,5 +1,6 @@
-import { Box } from "@mui/material"
+import { Box, Button } from "@mui/material"
 import ProfileCard from "./ProfileCard"
+import MatchModal from "./MatchModal";
 import { useEffect, useState } from "react"
 import { useUser } from "./UserContext";
 
@@ -12,6 +13,9 @@ function People() {
     const [currentDisplayed, setCurrentDisplayed] = useState(0);
     // keeps track of the num of user ids retrieved from the database
     const [numOfUsers, setNumOfUsers] = useState(0);
+
+    // if there is a match, the modal will open
+    const [thereIsAMatch, setThereIsAMatch] = useState(false);
 
     // fetch all user ids in the database
     const fetchAllUsers = async () => {
@@ -56,6 +60,9 @@ function People() {
         }
 
         console.log(data.message);
+        if (data.likesEachOther) {
+            setThereIsAMatch(true);
+        }
     }
 
     const handleUserLiked = (userId) => {
@@ -73,8 +80,30 @@ function People() {
         console.log(`user id that has been passed = ${userId}`);
     }
 
-    return <Box sx={{display:'flex', justifyContent:'center', transform: "translate(0%, 20%)"}}>
+    // for debugging, to delete the liked userIds of currentUser
+    const deleteLikedUsers = async () => {
+        console.log('delete users button clicked')
+        const response = await fetch(`http://localhost:5000/${currentUser.id}/delete-liked-users`, {
+            method:'DELETE',
+            headers: {
+                'Content-Type':'application/json',
+            },
+        })
+
+        const data = await response.json();
+
+        if (!response.ok) {
+            console.log(data.error);
+            return;
+        }
+
+        console.log(data.message);
+    }
+
+    return (<Box sx={{display:'flex', justifyContent:'center', transform: "translate(0%, 20%)"}}>
         <h2>Find your true love 💕</h2>
+
+        <MatchModal open={thereIsAMatch} close={() => setThereIsAMatch(false)}/>
         
         {
             allUsers.map((userId, index) => (
@@ -82,11 +111,12 @@ function People() {
                     <ProfileCard userId={userId} 
                         handleUserLiked={() => handleUserLiked(userId)} 
                         handleUserPassed={() => handleUserPassed(userId)} 
+                        thereIsAMatch={thereIsAMatch}
                     />
                 </Box>
             ))
         }
-    </Box>
+    </Box>)
 }
 
 export default People

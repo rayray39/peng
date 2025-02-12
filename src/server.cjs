@@ -87,7 +87,8 @@ const db = new sqlite3.Database(dbPath, (err) => {
             user_id INTEGER NOT NULL,
             liked_user_id INTEGER NOT NULL,
             FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
-            FOREIGN KEY (liked_user_id) REFERENCES users(id)
+            FOREIGN KEY (liked_user_id) REFERENCES users(id),
+            UNIQUE (user_id, liked_user_id)
             )`,
             (err) => {
                 if (err) {
@@ -97,7 +98,20 @@ const db = new sqlite3.Database(dbPath, (err) => {
                 }
             }
         )
-    })
+    });
+
+    // db.serialize(() => {
+    //     db.run(
+    //         `DROP TABLE user_likes`,
+    //         (err) => {
+    //             if (err) {
+    //                 console.error("Error dropping user_likes table:", err);
+    //             } else {
+    //                 console.log("user_likes table dropped.");
+    //             }
+    //         }
+    //     )
+    // })
 });
 
 // create a new user account - add new row of user data into database
@@ -441,16 +455,40 @@ app.post('/like-user', (req, res) => {
         return res.status(400).json({ error:"No liked user id." });
     }
 
-    const query = 'INSERT INTO user_likes (user_id, liked_user_id) VALUES (?, ?)'
+    // inserts the new row into the user_likes table
+    const insertQuery = 'INSERT INTO user_likes (user_id, liked_user_id) VALUES (?, ?)';
 
-    db.run(query, [currentUser.id, likedUserId], function (err) {
+    // checks whether likedUser has already liked currentUser
+    const checkMutualLikeQuery = `SELECT 1 FROM user_likes WHERE user_id = ? AND liked_user_id = ?`;
+
+    db.run(insertQuery, [currentUser.id, likedUserId], function (err) {
         if (err) {
+            if (err.code === 'SQL_CONSTRAINT') {
+                return res.status(400).json({ error: `userId: ${likedUserId} already liked by ${currentUser.username}` });
+            }
             console.error("Error adding liked_used_id to user_likes:", err);
             return res.status(500).json({ error: "Database error." });
         }
-    
-        res.status(200).json({
-            message: "Successfully added likedUserId to currentUser's list.",
+
+        // Check if the liked user had already liked the currentUser
+        db.get(checkMutualLikeQuery, [likedUserId, currentUser.id], (err, row) => {
+            if (err) {
+                console.error("Error checking mutual like:", err);
+                return res.status(500).json({ error: "Database error." });
+            }
+
+            if (row) {
+                // Mutual like detected, send a response to notify frontend
+                return res.status(200).json({ 
+                    message: `A Match! userId: ${currentUser.id} and userId: ${likedUserId} likes each other.`,
+                    likesEachOther: true 
+                });
+            }
+
+            return res.status(200).json({ 
+                message: 'Like registered into table successfully.',
+                likesEachOther: false 
+            });
         });
     })
 })
@@ -474,6 +512,28 @@ app.get('/:userId/liked-users', (req, res) => {
         res.status(200).json({
             userId: userId,
             likedUserIds: rows
+        });
+    })
+})
+
+// delete the list of liked user ids from logged in user, for debugging
+app.delete('/:userId/delete-liked-users', (req, res) => {
+    const userId = req.params.userId;
+
+    if (!userId) {
+        return res.status(400).json({ error: 'Missing user id.' });
+    }
+
+    const query = 'DELETE FROM user_likes WHERE user_id = ?';
+
+    db.run(query, [userId], function (err) {
+        if (err) {
+            console.error("Error deleting liked user ids:", err);
+            return res.status(500).json({ error: "Database error." });
+        }
+    
+        res.status(200).json({
+            message: "Liked user ids deleted successfully!",
         });
     })
 })
