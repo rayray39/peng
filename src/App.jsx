@@ -22,7 +22,7 @@ function App() {
         <Router>
             <Routes>
                 <Route path="/" element={<WelcomePage />} />
-                <Route path="/login" element={<Login setIsAuthenticated={setIsAuthenticated} />} />
+                <Route path="/login" element={<Login />} />
                 <Route path="/create-account" element={<CreateAccount />} />
 
                 <Route path="/fill-in-bio" element={isAuthenticated ? <FillBio /> : <Navigate to="/" />} />

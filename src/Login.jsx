@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useUser } from "./UserContext";
 
 // login user account page
-function Login({ setIsAuthenticated }) {
+function Login() {
     const navigate = useNavigate();
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
@@ -78,7 +78,6 @@ function Login({ setIsAuthenticated }) {
 
         // Store token in localStorage
         localStorage.setItem('authToken', data.token);
-        setIsAuthenticated(true);
 
         console.log(`currently logged in user: ${data.user.username}`);
 
