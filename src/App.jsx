@@ -1,4 +1,5 @@
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { useEffect, useState } from 'react';
 import './App.css'
 import CreateAccount from './CreateAccount'
 import Login from './Login'
@@ -21,12 +22,13 @@ function App() {
         <Router>
             <Routes>
                 <Route path="/" element={<WelcomePage />} />
-                <Route path="/login" element={<Login />} />
+                <Route path="/login" element={<Login setIsAuthenticated={setIsAuthenticated} />} />
                 <Route path="/create-account" element={<CreateAccount />} />
-                <Route path="/fill-in-bio" element={<FillBio />} />
-                <Route path='/select-hobbies' element={<Hobbies/>}/>
-                <Route path='/add-images' element={<AddImages/>}/>
-                <Route path='/people' element={isAuthenticated ? <People /> : <Navigate to="/login" />}/>
+
+                <Route path="/fill-in-bio" element={isAuthenticated ? <FillBio /> : <Navigate to="/" />} />
+                <Route path='/select-hobbies' element={isAuthenticated ? <Hobbies /> : <Navigate to="/" />}/>
+                <Route path='/add-images' element={isAuthenticated ? <AddImages /> : <Navigate to="/" />}/>
+                <Route path='/people' element={isAuthenticated ? <People /> : <Navigate to="/" />}/>
             </Routes>
         </Router>
     </>
