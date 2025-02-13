@@ -28,6 +28,9 @@ function AddImages() {
         images.forEach((image) => {
             formData.append('images', image.file); // Append each file to the form data
         });
+
+        // const token = localStorage.getItem('authToken');
+
         try {
             // Send a POST request to the backend to upload images to Cloudinary using fetch
             const response = await fetch('http://localhost:5000/upload-to-cloud', {
