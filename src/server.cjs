@@ -190,6 +190,151 @@ app.post("/log-user-in", (req, res) => {
     });
 })
 
+// returns all user ids in the database
+app.get('/all-userIds', (req, res) => {
+    const query = "SELECT * FROM users";
+
+    db.all(query, [], (err, rows) => {
+        if (err) {
+            console.error("Error retrieving user IDs:", err);
+            return res.status(500).json({ error: "Database error." });
+        }
+
+        // Extract just the ids from the result set
+        const rowIds = rows.map(row => row.id);
+
+        // Respond with all user ids as JSON
+        res.status(200).json({ userIds: rowIds });
+    })
+})
+
+// returns all users in the database
+app.get('/all-users', (req, res) => {
+    const query = "SELECT * FROM users";
+
+    db.all(query, [], (err, rows) => {
+        if (err) {
+            console.error("Error retrieving users:", err);
+            return res.status(500).json({ error: "Database error." });
+        }
+
+        // Respond with all users as JSON
+        res.status(200).json({ users: rows });
+    })
+})
+
+// returns all uploaded images of particular user
+app.get('/images/:userId', (req, res) => {
+    const userId = req.params.userId;
+
+    db.all(
+        'SELECT * FROM user_images WHERE user_id = ?',
+        [userId],
+        (err, rows) => {
+            if (err) {
+                console.error("Error fetching images:", err.message);
+                return res.status(500).json({ error: "Error fetching images" });
+            }
+            res.json({ images: rows });
+        }
+    );
+})
+
+// to delete all the images (in database) for currently logged in user
+app.delete('/delete-all-images', (req, res) => {
+    const { currentUser } = req.body;
+
+    if (!currentUser) {
+        return res.status(400).json({ error:"User not logged in" });
+    }
+
+    const query = 'DELETE FROM user_images WHERE user_id = ?';
+
+    db.run(query, [currentUser.id], function (err) {
+        if (err) {
+            console.error("Error deleting images:", err);
+            return res.status(500).json({ error: "Database error." });
+        }
+    
+        res.status(200).json({
+            message: "Images deleted successfully!",
+        });
+    })
+})
+
+// for creating fake accounts, by fetching images directly from Cloudinary and inserting into database
+app.post('/get-from-cloud', (req, res) => {
+    const { currentUser, cloudImageUrls } = req.body;
+
+    if (!currentUser) {
+        return res.status(400).json({ error:"User not logged in" });
+    }
+    if (!cloudImageUrls) {
+        return res.status(400).json({ error:"No cloud urls." });
+    }
+
+    const userId = currentUser.id;
+
+     // Insert uploaded image URLs into SQLite
+     const insertQuery = 'INSERT INTO user_images (user_id, image_url) VALUES (?, ?)';
+
+     db.serialize(() => {
+        const stmt = db.prepare(insertQuery);
+        cloudImageUrls.forEach(url => {
+            stmt.run(userId, url);
+        });
+        stmt.finalize();
+    });
+
+    return res.status(200).json({ message: "Images uploaded (fake) successfully", cloudImageUrls });
+})
+
+// gets all the liked user ids of a user
+app.get('/:userId/liked-users', (req, res) => {
+    const userId = req.params.userId;
+
+    if (!userId) {
+        return res.status(400).json({ error: 'Missing user id.' });
+    }
+
+    const query = 'SELECT liked_user_id FROM user_likes WHERE user_id = ?';
+
+    db.all(query, [userId], function (err, rows) {
+        if (err) {
+            console.error(`Error retrieving liked_used_ids for userId: ${userId}:`, err);
+            return res.status(500).json({ error: "Database error." });
+        }
+    
+        res.status(200).json({
+            userId: userId,
+            likedUserIds: rows
+        });
+    })
+})
+
+// delete the list of liked user ids from logged in user, for debugging
+app.delete('/:userId/delete-liked-users', (req, res) => {
+    const userId = req.params.userId;
+
+    if (!userId) {
+        return res.status(400).json({ error: 'Missing user id.' });
+    }
+
+    const query = 'DELETE FROM user_likes WHERE user_id = ?';
+
+    db.run(query, [userId], function (err) {
+        if (err) {
+            console.error("Error deleting liked user ids:", err);
+            return res.status(500).json({ error: "Database error." });
+        }
+    
+        res.status(200).json({
+            message: "Liked user ids deleted successfully!",
+        });
+    })
+})
+
+
 const authenticateToken = (req, res, next) => {
     // custon middleware for authentication
     const token = req.header("Authorization");
@@ -206,7 +351,7 @@ const authenticateToken = (req, res, next) => {
 app.use(authenticateToken); // routes defined after this middleware are all protected (require authentication) 
 
 // updates currently logged in user's bio
-app.post('/save-bio', (req, res) => {
+app.post('/save-bio', authenticateToken, (req, res) => {
     const { currentUser, bio } = req.body;
 
     if (!bio) {
@@ -240,7 +385,7 @@ app.post('/save-bio', (req, res) => {
 })
 
 // updates currently logged in user's selected hobbies
-app.post('/save-hobbies', (req, res) => {
+app.post('/save-hobbies', authenticateToken, (req, res) => {
     const { currentUser, selectedHobbies } = req.body;
 
     if (!selectedHobbies) {
@@ -287,7 +432,7 @@ const uploadToCloudinary = (fileBuffer) => {
 };
 
 // API endpoint to handle multiple image uploads (to Cloudinary and database)
-app.post("/upload-to-cloud", upload.array("images", 3), async (req, res) => {
+app.post("/upload-to-cloud", authenticateToken, upload.array("images", 3), async (req, res) => {
     try {
         const files = req.files;            // Get uploaded files from request
         const userId = req.body.userId;     // Assume user ID is sent in request body
@@ -368,105 +513,6 @@ app.get('/:user_id/data-imageUrls', authenticateToken, (req, res) => {
     })
 })
 
-// returns all user ids in the database
-app.get('/all-userIds', authenticateToken, (req, res) => {
-    const query = "SELECT * FROM users";
-
-    db.all(query, [], (err, rows) => {
-        if (err) {
-            console.error("Error retrieving user IDs:", err);
-            return res.status(500).json({ error: "Database error." });
-        }
-
-        // Extract just the ids from the result set
-        const rowIds = rows.map(row => row.id);
-
-        // Respond with all user ids as JSON
-        res.status(200).json({ userIds: rowIds });
-    })
-})
-
-// returns all users in the database
-app.get('/all-users', authenticateToken, (req, res) => {
-    const query = "SELECT * FROM users";
-
-    db.all(query, [], (err, rows) => {
-        if (err) {
-            console.error("Error retrieving users:", err);
-            return res.status(500).json({ error: "Database error." });
-        }
-
-        // Respond with all users as JSON
-        res.status(200).json({ users: rows });
-    })
-})
-
-// returns all uploaded images of particular user
-app.get('/images/:userId', authenticateToken, (req, res) => {
-    const userId = req.params.userId;
-
-    db.all(
-        'SELECT * FROM user_images WHERE user_id = ?',
-        [userId],
-        (err, rows) => {
-            if (err) {
-                console.error("Error fetching images:", err.message);
-                return res.status(500).json({ error: "Error fetching images" });
-            }
-            res.json({ images: rows });
-        }
-    );
-})
-
-// to delete all the images (in database) for currently logged in user
-app.delete('/delete-all-images', (req, res) => {
-    const { currentUser } = req.body;
-
-    if (!currentUser) {
-        return res.status(400).json({ error:"User not logged in" });
-    }
-
-    const query = 'DELETE FROM user_images WHERE user_id = ?';
-
-    db.run(query, [currentUser.id], function (err) {
-        if (err) {
-            console.error("Error deleting images:", err);
-            return res.status(500).json({ error: "Database error." });
-        }
-    
-        res.status(200).json({
-            message: "Images deleted successfully!",
-        });
-    })
-})
-
-// for creating fake accounts, by fetching images directly from Cloudinary and inserting into database
-app.post('/get-from-cloud', (req, res) => {
-    const { currentUser, cloudImageUrls } = req.body;
-
-    if (!currentUser) {
-        return res.status(400).json({ error:"User not logged in" });
-    }
-    if (!cloudImageUrls) {
-        return res.status(400).json({ error:"No cloud urls." });
-    }
-
-    const userId = currentUser.id;
-
-     // Insert uploaded image URLs into SQLite
-     const insertQuery = 'INSERT INTO user_images (user_id, image_url) VALUES (?, ?)';
-
-     db.serialize(() => {
-        const stmt = db.prepare(insertQuery);
-        cloudImageUrls.forEach(url => {
-            stmt.run(userId, url);
-        });
-        stmt.finalize();
-    });
-
-    return res.status(200).json({ message: "Images uploaded (fake) successfully", cloudImageUrls });
-})
-
 // adds likedUserId to the list of liked user ids of the current user
 app.post('/like-user', authenticateToken, (req, res) => {
     const { currentUser, likedUserId } = req.body;
@@ -512,51 +558,6 @@ app.post('/like-user', authenticateToken, (req, res) => {
                 message: 'Like registered into table successfully.',
                 likesEachOther: false 
             });
-        });
-    })
-})
-
-// gets all the liked user ids of a user
-app.get('/:userId/liked-users', authenticateToken, (req, res) => {
-    const userId = req.params.userId;
-
-    if (!userId) {
-        return res.status(400).json({ error: 'Missing user id.' });
-    }
-
-    const query = 'SELECT liked_user_id FROM user_likes WHERE user_id = ?';
-
-    db.all(query, [userId], function (err, rows) {
-        if (err) {
-            console.error(`Error retrieving liked_used_ids for userId: ${userId}:`, err);
-            return res.status(500).json({ error: "Database error." });
-        }
-    
-        res.status(200).json({
-            userId: userId,
-            likedUserIds: rows
-        });
-    })
-})
-
-// delete the list of liked user ids from logged in user, for debugging
-app.delete('/:userId/delete-liked-users', (req, res) => {
-    const userId = req.params.userId;
-
-    if (!userId) {
-        return res.status(400).json({ error: 'Missing user id.' });
-    }
-
-    const query = 'DELETE FROM user_likes WHERE user_id = ?';
-
-    db.run(query, [userId], function (err) {
-        if (err) {
-            console.error("Error deleting liked user ids:", err);
-            return res.status(500).json({ error: "Database error." });
-        }
-    
-        res.status(200).json({
-            message: "Liked user ids deleted successfully!",
         });
     })
 })
