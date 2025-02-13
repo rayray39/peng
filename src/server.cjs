@@ -16,6 +16,8 @@ const { CloudinaryStorage } = require("multer-storage-cloudinary");
 const app = express();
 const PORT = 5000;
 
+const SECRET_KEY = "my_super_secret_key_123"; // for authentication
+
 // middleware for CORS (cross origin resource sharing)
 app.use(cors());
 
@@ -137,8 +139,10 @@ app.post("/create-new-account", (req, res) => {
             return res.status(500).json({ error: "Database error." });
         }
 
+        const token = jwt.sign({ userId: this.lastID, username: username }, SECRET_KEY, { expiresIn: "1h" });
         // Respond with success
         return res.status(201).json({ 
+            token,
             message: "User created successfully!", 
             user: {
                 id: this.lastID,
@@ -173,8 +177,10 @@ app.post("/log-user-in", (req, res) => {
             return res.status(403).json({ error: 'Incorrect Password.' });
         }
 
+        const token = jwt.sign({ userId: row.id, username: row.username }, SECRET_KEY, { expiresIn: "1h" });
         // Respond with user data, excluding sensitive fields
         res.status(200).json({
+            token,
             message: 'Successfully logged in.',
             user: {
                 id: row.id,
@@ -183,6 +189,21 @@ app.post("/log-user-in", (req, res) => {
         });
     });
 })
+
+const authenticateToken = (req, res, next) => {
+    // custon middleware for authentication
+    const token = req.header("Authorization");
+    if (!token) return res.status(401).json({ error: "Access denied. No token provided." });
+
+    jwt.verify(token.replace("Bearer ", ""), SECRET_KEY, (err, user) => {
+        if (err) return res.status(403).json({ error: "Invalid token" });
+
+        req.user = user; // Attach user info to request
+        next();
+    });
+};
+
+app.use(authenticateToken); // routes defined after this middleware are all protected (require authentication) 
 
 // updates currently logged in user's bio
 app.post('/save-bio', (req, res) => {
@@ -297,7 +318,7 @@ app.post("/upload-to-cloud", upload.array("images", 3), async (req, res) => {
 });
 
 // returns all the data (firstName, lastName, bio, hobbies) about the currently logged in user
-app.get('/:user_id/data', (req, res) => {
+app.get('/:user_id/data', authenticateToken, (req, res) => {
     const userId = req.params.user_id;
 
     if (!userId) {
@@ -321,7 +342,7 @@ app.get('/:user_id/data', (req, res) => {
 })
 
 // returns all the imageUrls uploaded by the currently logged in user
-app.get('/:user_id/data-imageUrls', (req, res) => {
+app.get('/:user_id/data-imageUrls', authenticateToken, (req, res) => {
     const userId = req.params.user_id;
 
     if (!userId) {
@@ -348,7 +369,7 @@ app.get('/:user_id/data-imageUrls', (req, res) => {
 })
 
 // returns all user ids in the database
-app.get('/all-userIds', (req, res) => {
+app.get('/all-userIds', authenticateToken, (req, res) => {
     const query = "SELECT * FROM users";
 
     db.all(query, [], (err, rows) => {
@@ -366,7 +387,7 @@ app.get('/all-userIds', (req, res) => {
 })
 
 // returns all users in the database
-app.get('/all-users', (req, res) => {
+app.get('/all-users', authenticateToken, (req, res) => {
     const query = "SELECT * FROM users";
 
     db.all(query, [], (err, rows) => {
@@ -381,7 +402,7 @@ app.get('/all-users', (req, res) => {
 })
 
 // returns all uploaded images of particular user
-app.get('/images/:userId', (req, res) => {
+app.get('/images/:userId', authenticateToken, (req, res) => {
     const userId = req.params.userId;
 
     db.all(
@@ -447,7 +468,7 @@ app.post('/get-from-cloud', (req, res) => {
 })
 
 // adds likedUserId to the list of liked user ids of the current user
-app.post('/like-user', (req, res) => {
+app.post('/like-user', authenticateToken, (req, res) => {
     const { currentUser, likedUserId } = req.body;
 
     if (!currentUser) {
@@ -496,7 +517,7 @@ app.post('/like-user', (req, res) => {
 })
 
 // gets all the liked user ids of a user
-app.get('/:userId/liked-users', (req, res) => {
+app.get('/:userId/liked-users', authenticateToken, (req, res) => {
     const userId = req.params.userId;
 
     if (!userId) {

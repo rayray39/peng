@@ -11,10 +11,13 @@ function ProfileCard({ userId, handleUserLiked, handleUserPassed, thereIsAMatch 
 
     // fetch current logged in user's data (firstName, lastName, bio, hobbies)
     const fetchUserData = async () => {
+        const token = localStorage.getItem('authToken');
+
         const response = await fetch(`http://localhost:5000/${userId}/data`, {
             method:'GET',
             headers: {
                 'Content-Type':'application/json',
+                "Authorization": `Bearer ${token}`,
             },
         })
 
@@ -34,10 +37,13 @@ function ProfileCard({ userId, handleUserLiked, handleUserPassed, thereIsAMatch 
 
     // fetch currently logged in user's image urls
     const fetchImageUrls = async () => {
+        const token = localStorage.getItem('authToken');
+
         const response = await fetch(`http://localhost:5000/${userId}/data-imageUrls`, {
             method:'GET',
             headers: {
                 'Content-Type':'application/json',
+                "Authorization": `Bearer ${token}`,
             },
         })
 
