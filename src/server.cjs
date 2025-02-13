@@ -334,6 +334,27 @@ app.delete('/:userId/delete-liked-users', (req, res) => {
     })
 })
 
+// to delete a user from users table with id = userId
+app.delete('/delete-bobby/:userId', (req, res) => {
+    const userId = req.params.userId;
+
+    if (!userId) {
+        return res.status(400).json({ error: 'Missing user id.' });
+    }
+
+    const query = 'DELETE FROM users WHERE id = ?';
+
+    db.run(query, [userId], function (err) {
+        if (err) {
+            console.error("Error deleting bobby user:", err);
+            return res.status(500).json({ error: "Database error." });
+        }
+    
+        res.status(200).json({
+            message: "Bobby user deleted successfully!",
+        });
+    })
+})
 
 const authenticateToken = (req, res, next) => {
     // custon middleware for authentication
