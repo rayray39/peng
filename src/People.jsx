@@ -132,7 +132,7 @@ function People() {
             }
 
             <Drawer open={openProfile} onClose={() => setOpenProfile(false)}>
-                <ProfileDrawer />
+                <ProfileDrawer user={currentUser}/>
             </Drawer>
         </Box>
 
