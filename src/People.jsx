@@ -3,6 +3,7 @@ import ProfileCard from "./ProfileCard"
 import MatchModal from "./MatchModal";
 import { useEffect, useState } from "react"
 import { useUser } from "./UserContext";
+import ProfileDrawer from "./ProfileDrawer";
 
 // page to browse through other people's profiles, explore page
 function People() {
@@ -130,7 +131,9 @@ function People() {
                 ))
             }
 
-            <Drawer open={openProfile} onClose={() => setOpenProfile(false)}></Drawer>
+            <Drawer open={openProfile} onClose={() => setOpenProfile(false)}>
+                <ProfileDrawer />
+            </Drawer>
         </Box>
 
         <Stack direction={'row'} spacing={1} sx={{
