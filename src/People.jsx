@@ -1,4 +1,4 @@
-import { Box, Button, Stack } from "@mui/material"
+import { Box, Button, Stack, Drawer } from "@mui/material"
 import ProfileCard from "./ProfileCard"
 import MatchModal from "./MatchModal";
 import { useEffect, useState } from "react"
@@ -16,6 +16,9 @@ function People() {
 
     // if there is a match, the modal will open
     const [thereIsAMatch, setThereIsAMatch] = useState(false);
+
+    // opens / closes the profile drawer
+    const [openProfile, setOpenProfile] = useState(false);
 
     // fetch all user ids in the database
     const fetchAllUsers = async () => {
@@ -104,7 +107,9 @@ function People() {
 
     const openProfileDrawer = () => {
         // when open profile button (🐳 button) is clicked
-        console.log('open profile drawer button clicked')
+        console.log('open profile drawer button clicked');
+
+        setOpenProfile(true);
     }
 
     return (<>
@@ -124,6 +129,8 @@ function People() {
                     </Box>
                 ))
             }
+
+            <Drawer open={openProfile} onClose={() => setOpenProfile(false)}></Drawer>
         </Box>
 
         <Stack direction={'row'} spacing={1} sx={{
