@@ -1,10 +1,15 @@
 import { Box, Button, Stack } from "@mui/material"
+import { useNavigate } from "react-router-dom";
 
 // user logged out page
 function Logout() {
+    const navigate = useNavigate();
 
     const handleReturnHome = () => {
+        // when return home button is clicked
+        console.log('return home button clicked');
 
+        navigate('/');
     }
 
     return (
