@@ -1,4 +1,4 @@
-import { Box, Button } from "@mui/material"
+import { Box, Button, Stack } from "@mui/material"
 import ProfileCard from "./ProfileCard"
 import MatchModal from "./MatchModal";
 import { useEffect, useState } from "react"
@@ -102,23 +102,54 @@ function People() {
         console.log(data.message);
     }
 
-    return (<Box sx={{display:'flex', justifyContent:'center', transform: "translate(0%, 20%)"}}>
-        <h2>Find your true love 💕</h2>
+    const openProfileDrawer = () => {
+        // when open profile button (🐳 button) is clicked
+        console.log('open profile drawer button clicked')
+    }
 
-        <MatchModal open={thereIsAMatch} close={() => setThereIsAMatch(false)}/>
-        
-        {
-            allUsers.map((userId, index) => (
-                <Box key={index} sx={{position:'absolute', display: userId === allUsers[currentDisplayed] ? 'block' : 'none'}}>
-                    <ProfileCard userId={userId} 
-                        handleUserLiked={() => handleUserLiked(userId)} 
-                        handleUserPassed={() => handleUserPassed(userId)} 
-                        thereIsAMatch={thereIsAMatch}
-                    />
-                </Box>
-            ))
-        }
-    </Box>)
+    return (<>
+        <Box sx={{display:'flex', justifyContent:'center', transform: "translate(0%, 20%)"}}>
+            <h2>Find your true love 💕</h2>
+
+            <MatchModal open={thereIsAMatch} close={() => setThereIsAMatch(false)}/>
+
+            {
+                allUsers.map((userId, index) => (
+                    <Box key={index} sx={{position:'absolute', display: userId === allUsers[currentDisplayed] ? 'block' : 'none'}}>
+                        <ProfileCard userId={userId} 
+                            handleUserLiked={() => handleUserLiked(userId)} 
+                            handleUserPassed={() => handleUserPassed(userId)} 
+                            thereIsAMatch={thereIsAMatch}
+                        />
+                    </Box>
+                ))
+            }
+        </Box>
+
+        <Stack direction={'row'} spacing={1} sx={{
+            position: 'fixed', 
+            bottom: '5px', 
+            left: '50%', 
+            transform: 'translateX(-50%)',
+        }}>
+            <Button variant="contained" 
+                sx={{
+                    height:'50px', backgroundColor:'orange', 
+                }} 
+                disableElevation onClick={openProfileDrawer}>
+                🐳
+            </Button>
+
+            <Button variant="contained" 
+                sx={{
+                    height:'50px', backgroundColor:'orange', 
+                }} 
+                disableElevation onClick={openProfileDrawer}>
+                💌
+            </Button>
+        </Stack>
+    </>
+    )
 }
 
 export default People
