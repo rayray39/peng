@@ -1,5 +1,6 @@
 import { Box, Button, Stack } from "@mui/material"
 
+// user logged out page
 function Logout() {
 
     const handleReturnHome = () => {
