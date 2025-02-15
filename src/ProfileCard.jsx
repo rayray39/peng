@@ -99,7 +99,7 @@ function ProfileCard({ userId, handleUserLiked, handleUserPassed, thereIsAMatch 
                     
                     <Stack direction={'row'} spacing={2} sx={{display:'flex', justifyContent:'center'}}>
                         {hobbies.map((hobby, index) => (
-                            <Chip label={hobby} key={index} />
+                            <Chip label={hobby} key={index} sx={{backgroundColor:'orange', color:'white'}} />
                         ))}
                     </Stack>
 
