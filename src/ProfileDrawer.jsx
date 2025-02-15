@@ -6,7 +6,9 @@ function ProfileDrawer({ user }) {
         <ListItem disablePadding>
             <Stack>
                 <ListItemText primary={'Profile'} />
-                <ListItemText primary={`${user.firstName} ${user.lastName}`} />
+                <ListItemText primary={`
+                    ${user.firstName[0].toUpperCase() + user.firstName.slice(1)} 
+                    ${user.lastName[0].toUpperCase() + user.lastName.slice(1)}`} />
                 <ListItemText primary={`username: ${user.username}`} />
                 <ListItemText primary={`bio: ${user.bio}`} />
                 <ListItemText primary={`hobbies: ${user.hobbies}`} />
