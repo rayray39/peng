@@ -1,4 +1,4 @@
-import { Box, Chip, ListItem, ListItemText, Stack, Divider } from "@mui/material"
+import { Box, Chip, ListItem, Stack, Divider } from "@mui/material"
 
 // drawer that will be opened in People, to display profile of currently logged in user
 function ProfileDrawer({ user }) {
