@@ -147,10 +147,6 @@ app.post("/create-new-account", (req, res) => {
             user: {
                 id: this.lastID,
                 username: username,
-                firstName: row.firstname,
-                lastName: row.lastName,
-                bio: row.bio,
-                hobbies: row.hobbies,
             }
         });
     });
@@ -165,7 +161,7 @@ app.post("/log-user-in", (req, res) => {
     }
 
     // validate user identity
-    const query = `SELECT id, username, password FROM users WHERE username = ?`;
+    const query = `SELECT id, username, password, firstName, lastName, bio, hobbies FROM users WHERE username = ?`;
 
     db.get(query, [username], (err, row) => {
         if (err) {
@@ -189,7 +185,7 @@ app.post("/log-user-in", (req, res) => {
             user: {
                 id: row.id,
                 username: row.username,
-                firstName: row.firstname,
+                firstName: row.firstName,
                 lastName: row.lastName,
                 bio: row.bio,
                 hobbies: row.hobbies,
