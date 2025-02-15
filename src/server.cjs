@@ -146,7 +146,11 @@ app.post("/create-new-account", (req, res) => {
             message: "User created successfully!", 
             user: {
                 id: this.lastID,
-                username: username
+                username: username,
+                firstName: row.firstname,
+                lastName: row.lastName,
+                bio: row.bio,
+                hobbies: row.hobbies,
             }
         });
     });
@@ -184,7 +188,11 @@ app.post("/log-user-in", (req, res) => {
             message: 'Successfully logged in.',
             user: {
                 id: row.id,
-                username: row.username
+                username: row.username,
+                firstName: row.firstname,
+                lastName: row.lastName,
+                bio: row.bio,
+                hobbies: row.hobbies,
             }
         });
     });
