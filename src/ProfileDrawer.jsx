@@ -1,4 +1,4 @@
-import { Box, Chip, ListItem, Stack, Divider } from "@mui/material"
+import { Box, Chip, ListItem, Stack, Divider, Button } from "@mui/material"
 
 // drawer that will be opened in People, to display profile of currently logged in user
 function ProfileDrawer({ user }) {
@@ -27,6 +27,10 @@ function ProfileDrawer({ user }) {
         )
     }
 
+    const handleLogout = () => {
+        console.log("logout button clicked")
+    }
+
     return <Box sx={{width:'280px', padding:'10px'}}>
         <ListItem disablePadding>
             <Stack>
@@ -47,6 +51,22 @@ function ProfileDrawer({ user }) {
                 />
             </Stack>
         </ListItem>
+
+        <Button variant="outlined" 
+            sx={{
+                position:'fixed',
+                bottom:'20px',
+                backgroundColor:'white',
+                color:'orange',
+                borderColor:'orange',
+                "&:hover": {
+                    backgroundColor:'orange',
+                    color:'white'
+                }
+            }} 
+            disableElevation onClick={handleLogout}>
+            Logout
+        </Button>
     </Box>
 }
 
