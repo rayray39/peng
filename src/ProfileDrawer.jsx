@@ -1,7 +1,9 @@
 import { Box, Chip, ListItem, Stack, Divider, Button } from "@mui/material"
+import { useNavigate } from "react-router-dom";
 
 // drawer that will be opened in People, to display profile of currently logged in user
 function ProfileDrawer({ user }) {
+    const navigate = useNavigate();
 
     const hobbyChips = (hobbiesString) => {
         // generate the chips for each hobby of the user
@@ -28,7 +30,8 @@ function ProfileDrawer({ user }) {
     }
 
     const handleLogout = () => {
-        console.log("logout button clicked")
+        console.log("logout button clicked");
+        navigate('/logout');
     }
 
     return <Box sx={{width:'280px', padding:'10px'}}>
