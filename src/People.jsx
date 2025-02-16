@@ -155,7 +155,7 @@ function People() {
                     height:'50px', backgroundColor:'orange', 
                 }} 
                 disableElevation onClick={openProfileDrawer}>
-                💌
+                {`MESSAGES 💌`}
             </Button>
         </Stack>
     </>
