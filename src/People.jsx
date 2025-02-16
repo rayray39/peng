@@ -50,10 +50,13 @@ function People() {
 
     // adds the likedUserId to the list of userIds that have been liked by current user 
     const likeUser = async (likedUserId) => {
+        const token = localStorage.getItem('authToken');
+
         const response = await fetch('http://localhost:5000/like-user', {
             method:'POST',
             headers: {
                 'Content-Type':'application/json',
+                "Authorization": `Bearer ${token}`,
             },
             body: JSON.stringify({ currentUser, likedUserId }),
         })
