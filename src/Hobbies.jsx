@@ -48,6 +48,8 @@ function Hobbies() {
             setYetToSelectThree(false);
         }
 
+        // const token = localStorage.getItem('authToken');
+
         const response = await fetch("http://localhost:5000/save-hobbies", {
             method:'POST',
             headers: {

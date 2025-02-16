@@ -2,7 +2,7 @@ import { Box, Stack, Card, CardActions, CardContent, Typography, Button, Chip, I
 import { useEffect, useState } from "react";
 
 // display user information as a card
-function ProfileCard({ userId, handleUserLiked, handleUserPassed, thereIsAMatch }) {
+function ProfileCard({ userId, handleUserLiked, handleUserPassed }) {
     const [firstName, setFirstName] = useState('');
     const [lastName, setLastName] = useState('');
     const [bio, setBio] = useState('');
@@ -11,10 +11,13 @@ function ProfileCard({ userId, handleUserLiked, handleUserPassed, thereIsAMatch 
 
     // fetch current logged in user's data (firstName, lastName, bio, hobbies)
     const fetchUserData = async () => {
+        const token = localStorage.getItem('authToken');
+
         const response = await fetch(`http://localhost:5000/${userId}/data`, {
             method:'GET',
             headers: {
                 'Content-Type':'application/json',
+                "Authorization": `Bearer ${token}`,
             },
         })
 
@@ -34,10 +37,13 @@ function ProfileCard({ userId, handleUserLiked, handleUserPassed, thereIsAMatch 
 
     // fetch currently logged in user's image urls
     const fetchImageUrls = async () => {
+        const token = localStorage.getItem('authToken');
+
         const response = await fetch(`http://localhost:5000/${userId}/data-imageUrls`, {
             method:'GET',
             headers: {
                 'Content-Type':'application/json',
+                "Authorization": `Bearer ${token}`,
             },
         })
 
@@ -93,7 +99,7 @@ function ProfileCard({ userId, handleUserLiked, handleUserPassed, thereIsAMatch 
                     
                     <Stack direction={'row'} spacing={2} sx={{display:'flex', justifyContent:'center'}}>
                         {hobbies.map((hobby, index) => (
-                            <Chip label={hobby} key={index} />
+                            <Chip label={hobby} key={index} sx={{backgroundColor:'orange', color:'white'}} />
                         ))}
                     </Stack>
 

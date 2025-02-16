@@ -76,6 +76,9 @@ function Login() {
         setPasswordIncorrect(false);
         login(data.user);               // use function in context to set current user
 
+        // Store token in localStorage
+        localStorage.setItem('authToken', data.token);
+
         console.log(`currently logged in user: ${data.user.username}`);
 
         navigate('/people');       // navigate to People page if successfully logged in.

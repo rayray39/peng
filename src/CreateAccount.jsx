@@ -103,6 +103,9 @@ function CreateAccount() {
         console.log(data.message);
         login(data.user);
 
+        // Store token in localStorage
+        localStorage.setItem('authToken', data.token);
+
         console.log(`currently logged in user: ${data.user.username}`);
 
         navigate('/fill-in-bio');   // navigate to FillBio if account created successfully

@@ -1,8 +1,9 @@
-import { Box, Button } from "@mui/material"
+import { Box, Button, Stack, Drawer } from "@mui/material"
 import ProfileCard from "./ProfileCard"
 import MatchModal from "./MatchModal";
 import { useEffect, useState } from "react"
 import { useUser } from "./UserContext";
+import ProfileDrawer from "./ProfileDrawer";
 
 // page to browse through other people's profiles, explore page
 function People() {
@@ -17,12 +18,17 @@ function People() {
     // if there is a match, the modal will open
     const [thereIsAMatch, setThereIsAMatch] = useState(false);
 
+    // opens / closes the profile drawer
+    const [openProfile, setOpenProfile] = useState(false);
+
     // fetch all user ids in the database
     const fetchAllUsers = async () => {
+        const token = localStorage.getItem('authToken');
+
         const response = await fetch('http://localhost:5000/all-userIds', {
             method:'GET',
             headers: {
-                'Content-Type':'application/json',
+                "Authorization": `Bearer ${token}`,
             },
         })
 
@@ -44,10 +50,13 @@ function People() {
 
     // adds the likedUserId to the list of userIds that have been liked by current user 
     const likeUser = async (likedUserId) => {
+        const token = localStorage.getItem('authToken');
+
         const response = await fetch('http://localhost:5000/like-user', {
             method:'POST',
             headers: {
                 'Content-Type':'application/json',
+                "Authorization": `Bearer ${token}`,
             },
             body: JSON.stringify({ currentUser, likedUserId }),
         })
@@ -100,23 +109,59 @@ function People() {
         console.log(data.message);
     }
 
-    return (<Box sx={{display:'flex', justifyContent:'center', transform: "translate(0%, 20%)"}}>
-        <h2>Find your true love 💕</h2>
+    const openProfileDrawer = () => {
+        // when open profile button (🐳 button) is clicked
+        console.log('open profile drawer button clicked');
 
-        <MatchModal open={thereIsAMatch} close={() => setThereIsAMatch(false)}/>
-        
-        {
-            allUsers.map((userId, index) => (
-                <Box key={index} sx={{position:'absolute', display: userId === allUsers[currentDisplayed] ? 'block' : 'none'}}>
-                    <ProfileCard userId={userId} 
-                        handleUserLiked={() => handleUserLiked(userId)} 
-                        handleUserPassed={() => handleUserPassed(userId)} 
-                        thereIsAMatch={thereIsAMatch}
-                    />
-                </Box>
-            ))
-        }
-    </Box>)
+        setOpenProfile(true);
+    }
+
+    return (<>
+        <Box sx={{display:'flex', justifyContent:'center', transform: "translate(0%, 20%)"}}>
+            <h2>Find your true love 💕</h2>
+
+            <MatchModal open={thereIsAMatch} close={() => setThereIsAMatch(false)}/>
+
+            {
+                allUsers.map((userId, index) => (
+                    <Box key={index} sx={{position:'absolute', display: userId === allUsers[currentDisplayed] ? 'block' : 'none'}}>
+                        <ProfileCard userId={userId} 
+                            handleUserLiked={() => handleUserLiked(userId)} 
+                            handleUserPassed={() => handleUserPassed(userId)} 
+                        />
+                    </Box>
+                ))
+            }
+
+            <Drawer open={openProfile} onClose={() => setOpenProfile(false)}>
+                <ProfileDrawer user={currentUser}/>
+            </Drawer>
+        </Box>
+
+        <Stack direction={'row'} spacing={1} sx={{
+            position: 'fixed', 
+            bottom: '5px', 
+            left: '50%', 
+            transform: 'translateX(-50%)',
+        }}>
+            <Button variant="contained" 
+                sx={{
+                    height:'50px', backgroundColor:'orange', 
+                }} 
+                disableElevation onClick={openProfileDrawer}>
+                {`MY PROFILE 🐳`}
+            </Button>
+
+            <Button variant="contained" 
+                sx={{
+                    height:'50px', backgroundColor:'orange', 
+                }} 
+                disableElevation onClick={openProfileDrawer}>
+                {`MESSAGES 💌`}
+            </Button>
+        </Stack>
+    </>
+    )
 }
 
 export default People

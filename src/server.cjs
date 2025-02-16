@@ -5,7 +5,9 @@ const path = require('path');                   // for working with files and di
 const cors = require('cors');
 const sqlite3 = require("sqlite3").verbose();   // sqlite3 database
 const dbPath = path.resolve(__dirname, '../data/database.db'); // Adjust 'database.db' as needed
+const jwt = require("jsonwebtoken");            // for authentication
 
+// for Cloudinary image uploads
 const multer = require("multer");
 const { Readable } = require("stream");
 const cloudinary = require("cloudinary").v2;
@@ -13,6 +15,8 @@ const { CloudinaryStorage } = require("multer-storage-cloudinary");
 
 const app = express();
 const PORT = 5000;
+
+const SECRET_KEY = "my_super_secret_key_123"; // for authentication
 
 // middleware for CORS (cross origin resource sharing)
 app.use(cors());
@@ -114,7 +118,7 @@ const db = new sqlite3.Database(dbPath, (err) => {
     // })
 });
 
-// create a new user account - add new row of user data into database
+// create a new user account - add new row of user data into database (public endpoint)
 app.post("/create-new-account", (req, res) => {
     const { firstName, lastName, username, password } = req.body;
 
@@ -135,18 +139,20 @@ app.post("/create-new-account", (req, res) => {
             return res.status(500).json({ error: "Database error." });
         }
 
+        const token = jwt.sign({ userId: this.lastID, username: username }, SECRET_KEY, { expiresIn: "1h" });
         // Respond with success
         return res.status(201).json({ 
+            token,
             message: "User created successfully!", 
             user: {
                 id: this.lastID,
-                username: username
+                username: username,
             }
         });
     });
 });
 
-// retrieves user credentials from client-side, verfiy them, returns back the logged in user
+// retrieves user credentials from client-side, verfiy them, returns back the logged in user (public endpoint)
 app.post("/log-user-in", (req, res) => {
     const { username, password } = req.body;
 
@@ -155,7 +161,7 @@ app.post("/log-user-in", (req, res) => {
     }
 
     // validate user identity
-    const query = `SELECT id, username, password FROM users WHERE username = ?`;
+    const query = `SELECT id, username, password, firstName, lastName, bio, hobbies FROM users WHERE username = ?`;
 
     db.get(query, [username], (err, row) => {
         if (err) {
@@ -171,178 +177,21 @@ app.post("/log-user-in", (req, res) => {
             return res.status(403).json({ error: 'Incorrect Password.' });
         }
 
+        const token = jwt.sign({ userId: row.id, username: row.username }, SECRET_KEY, { expiresIn: "1h" });
         // Respond with user data, excluding sensitive fields
         res.status(200).json({
+            token,
             message: 'Successfully logged in.',
             user: {
                 id: row.id,
-                username: row.username
+                username: row.username,
+                firstName: row.firstName,
+                lastName: row.lastName,
+                bio: row.bio,
+                hobbies: row.hobbies,
             }
         });
     });
-})
-
-// updates currently logged in user's bio
-app.post('/save-bio', (req, res) => {
-    const { currentUser, bio } = req.body;
-
-    if (!bio) {
-        return res.status(400).json({ error: 'Missing bio.' });
-    }
-    if (!currentUser) {
-        return res.status(400).json({ error: 'User not logged in.' });
-    }
-
-    const query = `
-        UPDATE users
-        SET bio = ?
-        WHERE id = ? AND username = ?
-    `;
-
-    db.run(query, [bio, currentUser.id, currentUser.username], function (err) {
-        if (err) {
-            console.error("Error updating bio:", err);
-            return res.status(500).json({ error: "Database error." });
-        }
-    
-        if (this.changes === 0) {
-            return res.status(404).json({ error: "User not found." });
-        }
-    
-        res.status(200).json({
-            message: "Bio updated successfully!",
-        });
-    })
-
-})
-
-// updates currently logged in user's selected hobbies
-app.post('/save-hobbies', (req, res) => {
-    const { currentUser, selectedHobbies } = req.body;
-
-    if (!selectedHobbies) {
-        return res.status(400).json({ error: 'Missing hobbies.' });
-    }
-    if (!currentUser) {
-        return res.status(400).json({ error: 'User not logged in.' });
-    }
-
-    const query = `
-        UPDATE users
-        SET hobbies = ?
-        WHERE id = ? AND username = ?
-    `;
-
-    db.run(query, [selectedHobbies.join(","), currentUser.id, currentUser.username], function (err) {
-        if (err) {
-            console.error("Error updating hobbies:", err);
-            return res.status(500).json({ error: "Database error." });
-        }
-    
-        if (this.changes === 0) {
-            return res.status(404).json({ error: "User not found." });
-        }
-    
-        res.status(200).json({
-            message: "Hobbies updated successfully!",
-        });
-    })
-})
-
-// Function to upload a single image to Cloudinary using a Promise
-const uploadToCloudinary = (fileBuffer) => {
-    return new Promise((resolve, reject) => {
-        const uploadStream = cloudinary.uploader.upload_stream(
-            { folder: "user_images" }, // Cloudinary folder
-            (error, result) => {
-                if (error) reject(error);
-                else resolve(result.secure_url); // Return Cloudinary URL
-            }
-        );
-        Readable.from(fileBuffer).pipe(uploadStream); // Convert buffer to stream and upload
-    });
-};
-
-// API endpoint to handle multiple image uploads (to Cloudinary and database)
-app.post("/upload-to-cloud", upload.array("images", 3), async (req, res) => {
-    try {
-        const files = req.files;            // Get uploaded files from request
-        const userId = req.body.userId;     // Assume user ID is sent in request body
-
-        if (!files || files.length === 0) {
-            return res.status(400).json({ error: "No files uploaded" });
-        }
-
-        // Upload all images to Cloudinary in parallel
-        const imageUrls = await Promise.all(files.map(file => uploadToCloudinary(file.buffer)));
-
-        // Insert uploaded image URLs into SQLite
-        const insertQuery = `INSERT INTO user_images (user_id, image_url) VALUES (?, ?)`;
-
-        db.serialize(() => {
-            const stmt = db.prepare(insertQuery);
-            imageUrls.forEach(url => {
-                stmt.run(userId, url);
-            });
-            stmt.finalize();
-        });
-
-        res.json({ message: "Images uploaded successfully", imageUrls });
-    } catch (error) {
-        console.error("Error uploading images:", error);
-        res.status(500).json({ error: "Image upload failed" });
-    }
-});
-
-// returns all the data (firstName, lastName, bio, hobbies) about the currently logged in user
-app.get('/:user_id/data', (req, res) => {
-    const userId = req.params.user_id;
-
-    if (!userId) {
-        return res.status(400).json({ error: 'Missing user id.' });
-    }
-
-    const query = 'SELECT firstName, lastName, bio, hobbies FROM users WHERE id = ?';
-
-    db.get(query, [userId], (err, row) => {
-        if (err) {
-            console.error("Database query error:", err);
-            return res.status(500).json({ error: "Unable to retrieve user data." });
-        }
-
-        if (!row) {
-            return res.status(404).json({ error: "User not found" });
-        }
-
-        res.status(200).json({ userData: row, message: 'Successfully retrieved user data.' });
-    })
-})
-
-// returns all the imageUrls uploaded by the currently logged in user
-app.get('/:user_id/data-imageUrls', (req, res) => {
-    const userId = req.params.user_id;
-
-    if (!userId) {
-        return res.status(400).json({ error: 'Missing user id.' });
-    }
-
-    const query = 'SELECT image_url FROM user_images WHERE user_id = ?';
-
-    db.all(query, [userId], (err, rows) => {
-        if (err) {
-            console.error("Database query error:", err);
-            return res.status(500).json({ error: "Unable to retrieve user image urls." });
-        }
-
-        if (!rows) {
-            return res.status(404).json({ error: "User not found" });
-        }
-
-        // Extract just the image URLs from the result set
-        const imageUrls = rows.map(row => row.image_url);
-
-        res.status(200).json({ imageUrls: imageUrls, message: 'Successfully retrieved user image urls.' });
-    })
 })
 
 // returns all user ids in the database
@@ -444,8 +293,253 @@ app.post('/get-from-cloud', (req, res) => {
     return res.status(200).json({ message: "Images uploaded (fake) successfully", cloudImageUrls });
 })
 
+// gets all the liked user ids of a user
+app.get('/:userId/liked-users', (req, res) => {
+    const userId = req.params.userId;
+
+    if (!userId) {
+        return res.status(400).json({ error: 'Missing user id.' });
+    }
+
+    const query = 'SELECT liked_user_id FROM user_likes WHERE user_id = ?';
+
+    db.all(query, [userId], function (err, rows) {
+        if (err) {
+            console.error(`Error retrieving liked_used_ids for userId: ${userId}:`, err);
+            return res.status(500).json({ error: "Database error." });
+        }
+    
+        res.status(200).json({
+            userId: userId,
+            likedUserIds: rows
+        });
+    })
+})
+
+// delete the list of liked user ids from logged in user, for debugging
+app.delete('/:userId/delete-liked-users', (req, res) => {
+    const userId = req.params.userId;
+
+    if (!userId) {
+        return res.status(400).json({ error: 'Missing user id.' });
+    }
+
+    const query = 'DELETE FROM user_likes WHERE user_id = ?';
+
+    db.run(query, [userId], function (err) {
+        if (err) {
+            console.error("Error deleting liked user ids:", err);
+            return res.status(500).json({ error: "Database error." });
+        }
+    
+        res.status(200).json({
+            message: "Liked user ids deleted successfully!",
+        });
+    })
+})
+
+// to delete a user from users table with id = userId
+app.delete('/delete-bobby/:userId', (req, res) => {
+    const userId = req.params.userId;
+
+    if (!userId) {
+        return res.status(400).json({ error: 'Missing user id.' });
+    }
+
+    const query = 'DELETE FROM users WHERE id = ?';
+
+    db.run(query, [userId], function (err) {
+        if (err) {
+            console.error("Error deleting bobby user:", err);
+            return res.status(500).json({ error: "Database error." });
+        }
+    
+        res.status(200).json({
+            message: "Bobby user deleted successfully!",
+        });
+    })
+})
+
+const authenticateToken = (req, res, next) => {
+    // custon middleware for authentication
+    const token = req.header("Authorization");
+    if (!token) return res.status(401).json({ error: "Access denied. No token provided." });
+
+    jwt.verify(token.replace("Bearer ", ""), SECRET_KEY, (err, user) => {
+        if (err) return res.status(403).json({ error: "Invalid token" });
+
+        req.user = user; // Attach user info to request
+        next();
+    });
+};
+
+app.use(authenticateToken); // routes defined after this middleware are all protected (require authentication) 
+
+// updates currently logged in user's bio
+app.post('/save-bio', authenticateToken, (req, res) => {
+    const { currentUser, bio } = req.body;
+
+    if (!bio) {
+        return res.status(400).json({ error: 'Missing bio.' });
+    }
+    if (!currentUser) {
+        return res.status(400).json({ error: 'User not logged in.' });
+    }
+
+    const query = `
+        UPDATE users
+        SET bio = ?
+        WHERE id = ? AND username = ?
+    `;
+
+    db.run(query, [bio, currentUser.id, currentUser.username], function (err) {
+        if (err) {
+            console.error("Error updating bio:", err);
+            return res.status(500).json({ error: "Database error." });
+        }
+    
+        if (this.changes === 0) {
+            return res.status(404).json({ error: "User not found." });
+        }
+    
+        res.status(200).json({
+            message: "Bio updated successfully!",
+        });
+    })
+
+})
+
+// updates currently logged in user's selected hobbies
+app.post('/save-hobbies', authenticateToken, (req, res) => {
+    const { currentUser, selectedHobbies } = req.body;
+
+    if (!selectedHobbies) {
+        return res.status(400).json({ error: 'Missing hobbies.' });
+    }
+    if (!currentUser) {
+        return res.status(400).json({ error: 'User not logged in.' });
+    }
+
+    const query = `
+        UPDATE users
+        SET hobbies = ?
+        WHERE id = ? AND username = ?
+    `;
+
+    db.run(query, [selectedHobbies.join(","), currentUser.id, currentUser.username], function (err) {
+        if (err) {
+            console.error("Error updating hobbies:", err);
+            return res.status(500).json({ error: "Database error." });
+        }
+    
+        if (this.changes === 0) {
+            return res.status(404).json({ error: "User not found." });
+        }
+    
+        res.status(200).json({
+            message: "Hobbies updated successfully!",
+        });
+    })
+})
+
+// Function to upload a single image to Cloudinary using a Promise
+const uploadToCloudinary = (fileBuffer) => {
+    return new Promise((resolve, reject) => {
+        const uploadStream = cloudinary.uploader.upload_stream(
+            { folder: "user_images" }, // Cloudinary folder
+            (error, result) => {
+                if (error) reject(error);
+                else resolve(result.secure_url); // Return Cloudinary URL
+            }
+        );
+        Readable.from(fileBuffer).pipe(uploadStream); // Convert buffer to stream and upload
+    });
+};
+
+// API endpoint to handle multiple image uploads (to Cloudinary and database)
+app.post("/upload-to-cloud", authenticateToken, upload.array("images", 3), async (req, res) => {
+    try {
+        const files = req.files;            // Get uploaded files from request
+        const userId = req.body.userId;     // Assume user ID is sent in request body
+
+        if (!files || files.length === 0) {
+            return res.status(400).json({ error: "No files uploaded" });
+        }
+
+        // Upload all images to Cloudinary in parallel
+        const imageUrls = await Promise.all(files.map(file => uploadToCloudinary(file.buffer)));
+
+        // Insert uploaded image URLs into SQLite
+        const insertQuery = `INSERT INTO user_images (user_id, image_url) VALUES (?, ?)`;
+
+        db.serialize(() => {
+            const stmt = db.prepare(insertQuery);
+            imageUrls.forEach(url => {
+                stmt.run(userId, url);
+            });
+            stmt.finalize();
+        });
+
+        res.json({ message: "Images uploaded successfully", imageUrls });
+    } catch (error) {
+        console.error("Error uploading images:", error);
+        res.status(500).json({ error: "Image upload failed" });
+    }
+});
+
+// returns all the data (firstName, lastName, bio, hobbies) about the currently logged in user
+app.get('/:user_id/data', authenticateToken, (req, res) => {
+    const userId = req.params.user_id;
+
+    if (!userId) {
+        return res.status(400).json({ error: 'Missing user id.' });
+    }
+
+    const query = 'SELECT firstName, lastName, bio, hobbies FROM users WHERE id = ?';
+
+    db.get(query, [userId], (err, row) => {
+        if (err) {
+            console.error("Database query error:", err);
+            return res.status(500).json({ error: "Unable to retrieve user data." });
+        }
+
+        if (!row) {
+            return res.status(404).json({ error: "User not found" });
+        }
+
+        res.status(200).json({ userData: row, message: 'Successfully retrieved user data.' });
+    })
+})
+
+// returns all the imageUrls uploaded by the currently logged in user
+app.get('/:user_id/data-imageUrls', authenticateToken, (req, res) => {
+    const userId = req.params.user_id;
+
+    if (!userId) {
+        return res.status(400).json({ error: 'Missing user id.' });
+    }
+
+    const query = 'SELECT image_url FROM user_images WHERE user_id = ?';
+
+    db.all(query, [userId], (err, rows) => {
+        if (err) {
+            console.error("Database query error:", err);
+            return res.status(500).json({ error: "Unable to retrieve user image urls." });
+        }
+
+        if (!rows) {
+            return res.status(404).json({ error: "User not found" });
+        }
+
+        // Extract just the image URLs from the result set
+        const imageUrls = rows.map(row => row.image_url);
+
+        res.status(200).json({ imageUrls: imageUrls, message: 'Successfully retrieved user image urls.' });
+    })
+})
+
 // adds likedUserId to the list of liked user ids of the current user
-app.post('/like-user', (req, res) => {
+app.post('/like-user', authenticateToken, (req, res) => {
     const { currentUser, likedUserId } = req.body;
 
     if (!currentUser) {
@@ -489,51 +583,6 @@ app.post('/like-user', (req, res) => {
                 message: 'Like registered into table successfully.',
                 likesEachOther: false 
             });
-        });
-    })
-})
-
-// gets all the liked user ids of a user
-app.get('/:userId/liked-users', (req, res) => {
-    const userId = req.params.userId;
-
-    if (!userId) {
-        return res.status(400).json({ error: 'Missing user id.' });
-    }
-
-    const query = 'SELECT liked_user_id FROM user_likes WHERE user_id = ?';
-
-    db.all(query, [userId], function (err, rows) {
-        if (err) {
-            console.error(`Error retrieving liked_used_ids for userId: ${userId}:`, err);
-            return res.status(500).json({ error: "Database error." });
-        }
-    
-        res.status(200).json({
-            userId: userId,
-            likedUserIds: rows
-        });
-    })
-})
-
-// delete the list of liked user ids from logged in user, for debugging
-app.delete('/:userId/delete-liked-users', (req, res) => {
-    const userId = req.params.userId;
-
-    if (!userId) {
-        return res.status(400).json({ error: 'Missing user id.' });
-    }
-
-    const query = 'DELETE FROM user_likes WHERE user_id = ?';
-
-    db.run(query, [userId], function (err) {
-        if (err) {
-            console.error("Error deleting liked user ids:", err);
-            return res.status(500).json({ error: "Database error." });
-        }
-    
-        res.status(200).json({
-            message: "Liked user ids deleted successfully!",
         });
     })
 })
