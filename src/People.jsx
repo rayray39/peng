@@ -128,7 +128,6 @@ function People() {
                         <ProfileCard userId={userId} 
                             handleUserLiked={() => handleUserLiked(userId)} 
                             handleUserPassed={() => handleUserPassed(userId)} 
-                            thereIsAMatch={thereIsAMatch}
                         />
                     </Box>
                 ))
