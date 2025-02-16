@@ -147,7 +147,7 @@ function People() {
                     height:'50px', backgroundColor:'orange', 
                 }} 
                 disableElevation onClick={openProfileDrawer}>
-                🐳
+                {`MY PROFILE 🐳`}
             </Button>
 
             <Button variant="contained" 
