@@ -60,6 +60,10 @@ function MessagesDrawer({ user }) {
 }
 
 function UserProfile({ username, avatarColor }) {
+    const handleOpenMessage = () => {
+        console.log(`opening message with ${username}`)
+    }
+
     return (
         <Box sx={{
             display:'flex',
@@ -69,10 +73,11 @@ function UserProfile({ username, avatarColor }) {
             width:'260px',
             marginBottom:'2px',
             borderRadius:'4px',
+            cursor:'pointer',
             '&:hover': {
                 backgroundColor:'gainsboro'
             }
-        }}>
+        }} onClick={handleOpenMessage}>
             <Avatar sx={{bgcolor:avatarColor, marginRight:'20px'}}>{username[0]}</Avatar>
             <Box>{username}</Box>
         </Box>
