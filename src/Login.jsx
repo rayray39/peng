@@ -63,7 +63,7 @@ function Login() {
 
         const data = await response.json();
         if (!response.ok) {
-            if (response.status === 403) {
+            if (response.status === 403 || response.status === 404) {
                 setPasswordIncorrect(true);
             } else {
                 setPasswordIncorrect(false);
