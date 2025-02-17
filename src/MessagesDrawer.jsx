@@ -9,6 +9,7 @@ function MessagesDrawer({ user }) {
     ]
 
     const fetchMatchedUsers = async () => {
+        // get all the usernames of the users that the currently logged in user liked
         const token = localStorage.getItem('authToken');
 
         const response = await fetch(`http://localhost:5000/matched-users/${user.id}`, {
@@ -59,6 +60,7 @@ function MessagesDrawer({ user }) {
     </Box>
 }
 
+// styles the message profile for a user
 function UserProfile({ username, avatarColor }) {
     const handleOpenMessage = () => {
         console.log(`opening message with ${username}`)
