@@ -20,6 +20,8 @@ function People() {
 
     // opens / closes the profile drawer
     const [openProfile, setOpenProfile] = useState(false);
+    // opens / closes the messages drawer
+    const [openMessages, setOpenMessages] = useState(false);
 
     // fetch all user ids in the database
     const fetchAllUsers = async () => {
@@ -110,10 +112,17 @@ function People() {
     }
 
     const openProfileDrawer = () => {
-        // when open profile button (🐳 button) is clicked
+        // when open profile button (MY PROFILE 🐳 button) is clicked
         console.log('open profile drawer button clicked');
 
         setOpenProfile(true);
+    }
+
+    const openMessagesDrawer = () => {
+        // when open profile button (MESSAGES 💌 button) is clicked
+        console.log('open messages drawer button clicked');
+
+        setOpenMessages(true);
     }
 
     return (<>
@@ -136,6 +145,10 @@ function People() {
             <Drawer open={openProfile} onClose={() => setOpenProfile(false)}>
                 <ProfileDrawer user={currentUser}/>
             </Drawer>
+
+            <Drawer open={openMessages} onClose={() => setOpenMessages(false)} anchor="right" >
+                <ProfileDrawer user={currentUser}/>
+            </Drawer>
         </Box>
 
         <Stack direction={'row'} spacing={1} sx={{
@@ -156,7 +169,7 @@ function People() {
                 sx={{
                     height:'50px', backgroundColor:'orange', 
                 }} 
-                disableElevation onClick={openProfileDrawer}>
+                disableElevation onClick={openMessagesDrawer}>
                 {`MESSAGES 💌`}
             </Button>
         </Stack>
