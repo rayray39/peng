@@ -17,7 +17,7 @@ function App() {
     useEffect(() => {
         const token = localStorage.getItem("authToken");
         setIsAuthenticated(!!token); // Set true if token exists
-    }, [localStorage.getItem("authToken")]);
+    }, []);
 
     return <>
         <Router>

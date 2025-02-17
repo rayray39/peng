@@ -31,7 +31,7 @@ function ProfileDrawer({ user }) {
 
     const handleLogout = () => {
         console.log("logout button clicked");
-        localStorage.removeItem('authToken');    // remove the authToken
+        // localStorage.removeItem('authToken');    // remove the authToken
         console.log('user has been logged out');
         navigate('/logout');
     }
