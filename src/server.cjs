@@ -587,6 +587,36 @@ app.post('/like-user', authenticateToken, (req, res) => {
     })
 })
 
+// returns the usernames that have been liked by the current user
+app.get('/matched-users/:userId', authenticateToken, (req, res) => {
+    const userId = req.params.userId;
+
+    if (!userId) {
+        return res.status(400).json({ error: 'Missing user id.' });
+    }
+
+    const query = `
+        SELECT users.username 
+        FROM user_likes 
+        JOIN users ON user_likes.liked_user_id = users.id 
+        WHERE user_likes.user_id = ?`;
+
+    db.all(query, [userId], function (err, rows) {
+        if (err) {
+            console.error(`Error retrieving matched users for userId: ${userId}:`, err);
+            return res.status(500).json({ error: "Database error." });
+        }
+
+        const likedUsernames = rows.map(row => row.username);
+    
+        res.status(200).json({
+            userId: userId,
+            likedUsernames: likedUsernames,
+            message:'Successfully retrieved liked usernames.'
+        });
+    })
+})
+
 
 // Start the server
 app.listen(PORT, () => {

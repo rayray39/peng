@@ -148,7 +148,7 @@ function People() {
             </Drawer>
 
             <Drawer open={openMessages} onClose={() => setOpenMessages(false)} anchor="right" >
-                <MessagesDrawer />
+                <MessagesDrawer user={currentUser} />
             </Drawer>
         </Box>
 
