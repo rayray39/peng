@@ -4,6 +4,7 @@ import MatchModal from "./MatchModal";
 import { useEffect, useState } from "react"
 import { useUser } from "./UserContext";
 import ProfileDrawer from "./ProfileDrawer";
+import MessagesDrawer from "./MessagesDrawer";
 
 // page to browse through other people's profiles, explore page
 function People() {
@@ -147,7 +148,7 @@ function People() {
             </Drawer>
 
             <Drawer open={openMessages} onClose={() => setOpenMessages(false)} anchor="right" >
-                <ProfileDrawer user={currentUser}/>
+                <MessagesDrawer />
             </Drawer>
         </Box>
 
