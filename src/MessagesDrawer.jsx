@@ -1,5 +1,6 @@
 import { Box, Stack, ListItem, Divider, Avatar } from "@mui/material"
 import { useEffect, useState } from "react"
+import Messages from "./Messages";
 
 // drawer that will be opened in People, to display messages of users with currently logged in user
 function MessagesDrawer({ user }) {
@@ -62,27 +63,38 @@ function MessagesDrawer({ user }) {
 
 // styles the message profile for a user
 function UserProfile({ username, avatarColor }) {
+    const [openMessage, setOpenMessage] = useState(false);
+
     const handleOpenMessage = () => {
-        console.log(`opening message with ${username}`)
+        console.log(`opening message with ${username}`);
+        setOpenMessage(true);
+    }
+
+    const handleCloseMessage = () => {
+        setOpenMessage(false);
     }
 
     return (
-        <Box sx={{
-            display:'flex',
-            flexDirection:'row',
-            alignItems:'center',
-            padding: '8px',
-            width:'260px',
-            marginBottom:'2px',
-            borderRadius:'4px',
-            cursor:'pointer',
-            '&:hover': {
-                backgroundColor:'gainsboro'
-            }
-        }} onClick={handleOpenMessage}>
-            <Avatar sx={{bgcolor:avatarColor, marginRight:'20px'}}>{username[0]}</Avatar>
-            <Box>{username}</Box>
-        </Box>
+       <Box>
+             <Box sx={{
+                display:'flex',
+                flexDirection:'row',
+                alignItems:'center',
+                padding: '8px',
+                width:'260px',
+                marginBottom:'2px',
+                borderRadius:'4px',
+                cursor:'pointer',
+                '&:hover': {
+                    backgroundColor:'gainsboro'
+                }
+            }} onClick={handleOpenMessage}>
+                <Avatar sx={{bgcolor:avatarColor, marginRight:'20px'}}>{username[0]}</Avatar>
+                <Box>{username}</Box>
+            </Box>
+
+            <Messages username={username} open={openMessage} onClose={handleCloseMessage} />
+       </Box>
     )
 }
 
