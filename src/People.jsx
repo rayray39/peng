@@ -114,14 +114,14 @@ function People() {
 
     const openProfileDrawer = () => {
         // when open profile button (MY PROFILE 🐳 button) is clicked
-        console.log('open profile drawer button clicked');
+        console.log('opening profile drawer');
 
         setOpenProfile(true);
     }
 
     const openMessagesDrawer = () => {
         // when open profile button (MESSAGES 💌 button) is clicked
-        console.log('open messages drawer button clicked');
+        console.log('opening messages drawer');
 
         setOpenMessages(true);
     }
