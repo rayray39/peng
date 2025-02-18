@@ -1,6 +1,7 @@
 import { Box, Stack, ListItem, Divider, Avatar } from "@mui/material"
 import { useEffect, useState } from "react"
 import Messages from "./Messages";
+import { useNavigate } from "react-router-dom";
 
 // drawer that will be opened in People, to display messages of users with currently logged in user
 function MessagesDrawer({ user }) {
@@ -63,15 +64,11 @@ function MessagesDrawer({ user }) {
 
 // styles the message profile for a user
 function UserProfile({ username, avatarColor }) {
-    const [openMessage, setOpenMessage] = useState(false);
+    const navigate = useNavigate();
 
     const handleOpenMessage = () => {
         console.log(`opening message with ${username}`);
-        setOpenMessage(true);
-    }
-
-    const handleCloseMessage = () => {
-        setOpenMessage(false);
+        navigate(`/messages/${username}`);
     }
 
     return (
@@ -92,8 +89,6 @@ function UserProfile({ username, avatarColor }) {
                 <Avatar sx={{bgcolor:avatarColor, marginRight:'20px'}}>{username[0]}</Avatar>
                 <Box>{username}</Box>
             </Box>
-
-            <Messages username={username} open={openMessage} onClose={handleCloseMessage} />
        </Box>
     )
 }

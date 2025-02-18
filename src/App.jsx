@@ -9,6 +9,7 @@ import Hobbies from './Hobbies';
 import AddImages from './AddImages';
 import People from './People';
 import Logout from './Logout';
+import Messages from './Messages';
 
 function App() {
     // user can only access the route if authenticated
@@ -30,6 +31,7 @@ function App() {
                 <Route path='/select-hobbies' element={isAuthenticated ? <Hobbies /> : <Navigate to="/" />}/>
                 <Route path='/add-images' element={isAuthenticated ? <AddImages /> : <Navigate to="/" />}/>
                 <Route path='/people' element={isAuthenticated ? <People /> : <Navigate to="/" />}/>
+                <Route path='/messages/:username' element={isAuthenticated ? <Messages /> : <Navigate to="/" />}/>
 
                 <Route path="/logout" element={<Logout />} />
             </Routes>
