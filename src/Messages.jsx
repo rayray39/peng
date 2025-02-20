@@ -1,10 +1,11 @@
 import { Box, Stack, Button, TextField } from "@mui/material"
-import { useParams } from "react-router-dom"
+import { useNavigate, useParams } from "react-router-dom"
 import { useUser } from "./UserContext";
 import { useEffect, useRef, useState } from "react";
 
 // opens the messages currently logged in user has with username
 function Messages() {
+    const navigate = useNavigate();
     const { username } = useParams();
     const { currentUser } = useUser();
 
@@ -86,6 +87,11 @@ function Messages() {
         document.getElementById('message-textfield')?.blur();   // clear the textfield after message sent
     }
 
+    const goBack = () => {
+        console.log('go back button clicked');
+        navigate('/people')
+    }
+
     return (
         <Stack direction={"column"} sx={{
             // border:'1px solid black', 
@@ -94,7 +100,7 @@ function Messages() {
         }}>
             <h3>{`${username} ❣️`}</h3>
 
-            <Stack sx={{border:'1px solid black', height:'300px', overflow:'auto', marginBottom:'4px'}} spacing={1}>
+            <Stack sx={{height:'300px', overflow:'auto', marginBottom:'4px'}} spacing={1}>
                 {
                     displayMessages ? 
                     displayMessages.map((message, index) => (
@@ -119,6 +125,18 @@ function Messages() {
                 }}
             >
                 Send
+            </Button>
+
+            <Button sx={{
+                backgroundColor:'orange',
+                color: 'white',
+                height: '50px',
+                position: 'fixed',
+                bottom: '5px',
+                left: '50%', 
+                transform: 'translateX(-50%)',
+            }} onClick={goBack}>
+                BACK
             </Button>
         </Stack>
     )
