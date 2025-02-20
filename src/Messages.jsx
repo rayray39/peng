@@ -1,7 +1,7 @@
 import { Box, Stack, Button, TextField } from "@mui/material"
 import { useParams } from "react-router-dom"
 import { useUser } from "./UserContext";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 // opens the messages currently logged in user has with username
 function Messages() {
@@ -11,6 +11,13 @@ function Messages() {
     const [messages, setMessages] = useState([]);               // past messages from database
     const [messageContent, setMessageContent] = useState('');   // newly sent message
     const [displayMessages, setDisplayMessages] = useState([]);
+
+    const messagesEndRef = useRef(null);
+
+    useEffect(() => {
+        // Scroll to the bottom when displayMessages change
+        messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    }, [displayMessages]);
 
     const handleMessageContent = (event) => {
         setMessageContent(event.target.value);
@@ -82,7 +89,7 @@ function Messages() {
         }}>
             <h3>{`${username} ❣️`}</h3>
 
-            <Stack sx={{border:'1px solid black', height:'300px', overflow:'auto'}} spacing={1}>
+            <Stack sx={{border:'1px solid black', height:'300px', overflow:'auto', marginBottom:'4px'}} spacing={1}>
                 {
                     displayMessages ? 
                     displayMessages.map((message, index) => (
@@ -90,6 +97,8 @@ function Messages() {
                     )) :
                     null
                 }
+
+                <div ref={messagesEndRef} />
             </Stack>
 
             <TextField id="message-textfield" variant="filled" value={messageContent} onChange={handleMessageContent} />
@@ -115,7 +124,7 @@ function MessageBubble({ message }) {
             backgroundColor:'orange',
             color:'white',
             borderRadius:'6px',
-            width:'50%',
+            width:'40%',
             textAlign:'start',
             alignSelf:'flex-end'
         }}>
