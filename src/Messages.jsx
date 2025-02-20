@@ -108,6 +108,7 @@ function Messages() {
     )
 }
 
+// display message content inside a bubble
 function MessageBubble({ message }) {
     return (
         <Box sx={{
