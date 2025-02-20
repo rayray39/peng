@@ -82,7 +82,7 @@ function Messages() {
         }}>
             <h3>{`${username} ❣️`}</h3>
 
-            <Stack sx={{border:'1px solid black', height:'300px'}} spacing={1}>
+            <Stack sx={{border:'1px solid black', height:'300px', overflow:'auto'}} spacing={1}>
                 {
                     displayMessages ? 
                     displayMessages.map((message, index) => (
@@ -117,6 +117,7 @@ function MessageBubble({ message }) {
             borderRadius:'6px',
             width:'50%',
             textAlign:'start',
+            alignSelf:'flex-end'
         }}>
             {message}
         </Box>
