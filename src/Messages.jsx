@@ -82,13 +82,11 @@ function Messages() {
         }}>
             <h3>{`${username} ❣️`}</h3>
 
-            <Stack sx={{border:'1px solid black', height:'300px'}}>
+            <Stack sx={{border:'1px solid black', height:'300px'}} spacing={1}>
                 {
                     displayMessages ? 
                     displayMessages.map((message, index) => (
-                        <Box key={index}>
-                            {message}
-                        </Box>
+                        <MessageBubble message={message} key={index} />
                     )) :
                     null
                 }
@@ -107,6 +105,20 @@ function Messages() {
                 Send
             </Button>
         </Stack>
+    )
+}
+
+function MessageBubble({ message }) {
+    return (
+        <Box sx={{
+            backgroundColor:'orange',
+            color:'white',
+            borderRadius:'6px',
+            width:'50%',
+            textAlign:'start',
+        }}>
+            {message}
+        </Box>
     )
 }
 
