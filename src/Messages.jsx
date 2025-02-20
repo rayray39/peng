@@ -19,63 +19,68 @@ function Messages() {
         messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
     }, [displayMessages]);
 
+    useEffect(() => {
+        fetchMessages();
+    }, [])
+
     const handleMessageContent = (event) => {
         setMessageContent(event.target.value);
     }
 
     const fetchMessages = async () => {
+        // get all the messages between currentUser and user with username
         console.log('fetching messages');
 
-        // const token = localStorage.getItem('authToken');
+        const token = localStorage.getItem('authToken');
 
-        // const response = await fetch('http://localhost:5000/get-all-messages', {
-        //     method:'GET',
-        //     headers:{
-        //         'Content-Type':'application/json',
-        //         'Authorization':`Bearer ${token}`
-        //     },
-        //     body:JSON.stringify({
-        //         currentUser, username
-        //     })
-        // })
+        const response = await fetch('http://localhost:5000/get-all-messages', {
+            method:'POST',
+            headers:{
+                'Content-Type':'application/json',
+                'Authorization':`Bearer ${token}`
+            },
+            body:JSON.stringify({
+                currentUser, username
+            })
+        })
 
-        // const data = await response.json();
+        const data = await response.json();
 
-        // if (!response.ok) {
-        //     console.log(data.error);
-        //     return;
-        // }
+        if (!response.ok) {
+            console.log(data.error);
+            return;
+        }
 
-        // console.log(data.message);
-        // setMessages(data.messages);
-        // setDisplayMessages(data.messages);
+        console.log(data.message);
+        setMessages(data.messages);
+        setDisplayMessages(data.messages);
     }
 
     const sendMessage = async () => {
         // saves the sent message in the database
         console.log(`sending message to ${username}: ${messageContent}`);
 
-        // const token = localStorage.getItem('authToken');
+        const token = localStorage.getItem('authToken');
 
-        // const response = await fetch('http://localhost:5000/send-message', {
-        //     method:'POST',
-        //     headers:{
-        //         'Content-Type':'application/json',
-        //         'Authorization':`Bearer ${token}`
-        //     },
-        //     body:JSON.stringify({
-        //         currentUser, username, messageContent
-        //     })
-        // })
+        const response = await fetch('http://localhost:5000/send-message', {
+            method:'POST',
+            headers:{
+                'Content-Type':'application/json',
+                'Authorization':`Bearer ${token}`
+            },
+            body:JSON.stringify({
+                currentUser, username, messageContent
+            })
+        })
 
-        // const data = await response.json();
+        const data = await response.json();
 
-        // if (!response.ok) {
-        //     console.log(data.error);
-        //     return;
-        // }
+        if (!response.ok) {
+            console.log(data.error);
+            return;
+        }
 
-        // console.log(data.message);
+        console.log(data.message);
         setDisplayMessages((prev) => [...prev, messageContent]);
         setMessageContent('');
         document.getElementById('message-textfield')?.blur();   // clear the textfield after message sent
@@ -93,7 +98,9 @@ function Messages() {
                 {
                     displayMessages ? 
                     displayMessages.map((message, index) => (
-                        <MessageBubble message={message} key={index} />
+                        message.sender === currentUser.username ?
+                            <MessageBubble message={message.content} alignment={'flex-end'} bgColor={'orange'} key={index} /> :
+                            <MessageBubble message={message.content} alignment={'flex-start'} bgColor={'black'} key={index} />
                     )) :
                     null
                 }
@@ -118,15 +125,17 @@ function Messages() {
 }
 
 // display message content inside a bubble
-function MessageBubble({ message }) {
+function MessageBubble({ message, alignment, bgColor }) {
+    // alignment = flex-end -> current user is sender
+    // alignment = flex-start -> receiving messages
     return (
         <Box sx={{
-            backgroundColor:'orange',
+            backgroundColor: bgColor,
             color:'white',
             borderRadius:'6px',
             width:'40%',
             textAlign:'start',
-            alignSelf:'flex-end'
+            alignSelf: alignment
         }}>
             {message}
         </Box>
