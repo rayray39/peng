@@ -18,6 +18,8 @@ function People() {
 
     // if there is a match, the modal will open
     const [thereIsAMatch, setThereIsAMatch] = useState(false);
+    // retreive the username of the user that has been liked
+    const [likedUsername, setLikedUsername] = useState('');
 
     // opens / closes the profile drawer
     const [openProfile, setOpenProfile] = useState(false);
@@ -74,6 +76,7 @@ function People() {
         console.log(data.message);
         if (data.likesEachOther) {
             setThereIsAMatch(true);
+            setLikedUsername(data.likedUsername);
         }
     }
 
@@ -130,7 +133,7 @@ function People() {
         <Box sx={{display:'flex', justifyContent:'center', transform: "translate(0%, 20%)"}}>
             <h2>Find your true love 💕</h2>
 
-            <MatchModal open={thereIsAMatch} close={() => setThereIsAMatch(false)}/>
+            <MatchModal likedUser={likedUsername} open={thereIsAMatch} close={() => setThereIsAMatch(false)}/>
 
             {
                 allUsers.map((userId, index) => (

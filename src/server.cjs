@@ -611,6 +611,8 @@ app.post('/like-user', authenticateToken, (req, res) => {
     // checks whether likedUser has already liked currentUser
     const checkMutualLikeQuery = `SELECT 1 FROM user_likes WHERE user_id = ? AND liked_user_id = ?`;
 
+    const getLikedUserQuery = 'SELECT username FROM users where id = ?';
+
     db.run(insertQuery, [currentUser.id, likedUserId], function (err) {
         if (err) {
             if (err.code === 'SQL_CONSTRAINT') {
@@ -628,17 +630,26 @@ app.post('/like-user', authenticateToken, (req, res) => {
             }
 
             if (row) {
-                // Mutual like detected, send a response to notify frontend
+                db.get(getLikedUserQuery, [likedUserId], function (err, rowUsername) {
+                    if (err) {
+                        console.error("Error retreiving liked username:", err);
+                        return res.status(500).json({ error: "Database error." });
+                    }
+
+                    // Mutual like detected, send a response to notify frontend
+                    return res.status(200).json({ 
+                        message: `A Match! userId: ${currentUser.id} and userId: ${likedUserId} likes each other.`,
+                        likesEachOther: true,
+                        likedUsername: rowUsername.username
+                    });
+                })
+            } else {
                 return res.status(200).json({ 
-                    message: `A Match! userId: ${currentUser.id} and userId: ${likedUserId} likes each other.`,
-                    likesEachOther: true 
+                    message: 'Like registered into table successfully.',
+                    likesEachOther: false,
+                    likedUsername: null 
                 });
             }
-
-            return res.status(200).json({ 
-                message: 'Like registered into table successfully.',
-                likesEachOther: false 
-            });
         });
     })
 })
