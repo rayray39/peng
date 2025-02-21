@@ -1,6 +1,8 @@
 import { Modal, Box, Typography, Button } from "@mui/material"
+import { useNavigate } from "react-router-dom";
 
-function MatchModal({ open, close }) {
+function MatchModal({ likedUser, open, close }) {
+    const navigate = useNavigate();
 
     const style = {
         position: 'absolute',
@@ -18,7 +20,8 @@ function MatchModal({ open, close }) {
     };
 
     const handleSendMessage = () => {
-        console.log('send message button clicked');
+        console.log(`navigating to chat with ${likedUser}`);
+        navigate(`/messages/${likedUser}`);
     }
 
     return (
