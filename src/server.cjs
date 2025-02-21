@@ -116,6 +116,27 @@ const db = new sqlite3.Database(dbPath, (err) => {
     //         }
     //     )
     // })
+
+    db.serialize(() => {
+        db.run(
+            `CREATE TABLE IF NOT EXISTS messages (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                sender_username TEXT NOT NULL,
+                receiver_username TEXT NOT NULL,
+                content TEXT NOT NULL,
+                timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
+                FOREIGN KEY (sender_username) REFERENCES users(username),
+                FOREIGN KEY (receiver_username) REFERENCES users(username)
+            )`,
+            (err) => {
+                if (err) {
+                    console.error("Error creating messages table:", err);
+                } else {
+                    console.log("messages table created or already exists.");
+                }
+            }
+        )
+    })
 });
 
 // create a new user account - add new row of user data into database (public endpoint)
@@ -360,6 +381,41 @@ app.delete('/delete-bobby/:userId', (req, res) => {
     })
 })
 
+
+app.get('/get-all-messages/:username', (req, res) => {
+    const username = req.params.username;
+
+    const query = `
+        SELECT sender_username, receiver_username, content 
+        FROM messages 
+        WHERE sender_username = ? OR receiver_username = ?
+        ORDER BY timestamp ASC
+    `;
+
+    db.all(query, [username, username], function (err, rows) {
+        if (err) {
+            console.error("Error fetching user messages:", error);
+            res.status(500).json({ error: "Internal server error" });
+        }
+        // Split messages into sent and received categories
+        const sentMessages = [];
+        const receivedMessages = [];
+
+        rows.forEach(msg => {
+            if (msg.sender_username === username) {
+                sentMessages.push({ receiver: msg.receiver_username, content: msg.content });
+            } else {
+                receivedMessages.push({ sender: msg.sender_username, content: msg.content });
+            }
+        });
+
+        res.status(200).json({
+            sent: sentMessages,
+            received: receivedMessages
+        })
+    })
+})
+
 const authenticateToken = (req, res, next) => {
     // custon middleware for authentication
     const token = req.header("Authorization");
@@ -555,6 +611,8 @@ app.post('/like-user', authenticateToken, (req, res) => {
     // checks whether likedUser has already liked currentUser
     const checkMutualLikeQuery = `SELECT 1 FROM user_likes WHERE user_id = ? AND liked_user_id = ?`;
 
+    const getLikedUserQuery = 'SELECT username FROM users where id = ?';
+
     db.run(insertQuery, [currentUser.id, likedUserId], function (err) {
         if (err) {
             if (err.code === 'SQL_CONSTRAINT') {
@@ -572,17 +630,115 @@ app.post('/like-user', authenticateToken, (req, res) => {
             }
 
             if (row) {
-                // Mutual like detected, send a response to notify frontend
+                db.get(getLikedUserQuery, [likedUserId], function (err, rowUsername) {
+                    if (err) {
+                        console.error("Error retreiving liked username:", err);
+                        return res.status(500).json({ error: "Database error." });
+                    }
+
+                    // Mutual like detected, send a response to notify frontend
+                    return res.status(200).json({ 
+                        message: `A Match! userId: ${currentUser.id} and userId: ${likedUserId} likes each other.`,
+                        likesEachOther: true,
+                        likedUsername: rowUsername.username
+                    });
+                })
+            } else {
                 return res.status(200).json({ 
-                    message: `A Match! userId: ${currentUser.id} and userId: ${likedUserId} likes each other.`,
-                    likesEachOther: true 
+                    message: 'Like registered into table successfully.',
+                    likesEachOther: false,
+                    likedUsername: null 
                 });
             }
+        });
+    })
+})
 
-            return res.status(200).json({ 
-                message: 'Like registered into table successfully.',
-                likesEachOther: false 
-            });
+// returns the usernames that have been liked by the current user
+app.get('/matched-users/:userId', authenticateToken, (req, res) => {
+    const userId = req.params.userId;
+
+    if (!userId) {
+        return res.status(400).json({ error: 'Missing user id.' });
+    }
+
+    const query = `
+        SELECT users.username 
+        FROM user_likes 
+        JOIN users ON user_likes.liked_user_id = users.id 
+        WHERE user_likes.user_id = ?`;
+
+    db.all(query, [userId], function (err, rows) {
+        if (err) {
+            console.error(`Error retrieving matched users for userId: ${userId}:`, err);
+            return res.status(500).json({ error: "Database error." });
+        }
+
+        const likedUsernames = rows.map(row => row.username);
+    
+        res.status(200).json({
+            userId: userId,
+            likedUsernames: likedUsernames,
+            message:'Successfully retrieved liked usernames.'
+        });
+    })
+})
+
+// get all the messages between 2 users
+app.post('/get-all-messages', authenticateToken, (req, res) => {
+    const { currentUser, username } = req.body;
+
+    if (!currentUser || !username) {
+        return res.status(400).json({ error:'Missing user.' });
+    }
+
+    const query = `
+        SELECT sender_username, receiver_username, content, timestamp
+        FROM messages
+        WHERE (sender_username = ? AND receiver_username = ?)
+        OR (sender_username = ? AND receiver_username = ?)
+        ORDER BY timestamp ASC
+    `;
+
+    db.all(query, [currentUser.username, username, username, currentUser.username], function (err, rows) {
+        if (err) {
+            console.error(`Error retrieving messages for users: ${currentUser.username} & ${username}:`, err);
+            return res.status(500).json({ error: "Database error." });
+        }
+
+        const messages = rows.map((row) => ({
+            content: row.content,
+            sender: row.sender_username
+        }))
+    
+        res.status(200).json({
+            messages: messages,
+            message:'Successfully retrieved messages.'
+        });
+    })
+})
+
+// saves the sent message to the database table (messages)
+app.post('/send-message', authenticateToken, (req, res) => {
+    const { currentUser, username, messageContent } = req.body;
+
+    if (!currentUser || !username) {
+        return res.status(400).json({ error:'Missing user.' });
+    }
+    if (!messageContent) {
+        return res.status(400).json({ error:'Missing message content.' });
+    }
+
+    const query = 'INSERT INTO messages (sender_username, receiver_username, content) VALUES (?, ?, ?)';
+
+    db.run(query, [currentUser.username, username, messageContent], function (err) {
+        if (err) {
+            console.error("Error sending message:", err);
+            return res.status(500).json({ error: "Database error." });
+        }
+    
+        res.status(200).json({
+            message: "Message successfully sent!",
         });
     })
 })

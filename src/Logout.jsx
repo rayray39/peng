@@ -7,7 +7,7 @@ function Logout() {
 
     const handleReturnHome = () => {
         // when return home button is clicked
-        console.log('return home button clicked');
+        console.log('returning to home');
 
         navigate('/');
     }

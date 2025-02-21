@@ -4,6 +4,7 @@ import MatchModal from "./MatchModal";
 import { useEffect, useState } from "react"
 import { useUser } from "./UserContext";
 import ProfileDrawer from "./ProfileDrawer";
+import MessagesDrawer from "./MessagesDrawer";
 
 // page to browse through other people's profiles, explore page
 function People() {
@@ -17,9 +18,13 @@ function People() {
 
     // if there is a match, the modal will open
     const [thereIsAMatch, setThereIsAMatch] = useState(false);
+    // retreive the username of the user that has been liked
+    const [likedUsername, setLikedUsername] = useState('');
 
     // opens / closes the profile drawer
     const [openProfile, setOpenProfile] = useState(false);
+    // opens / closes the messages drawer
+    const [openMessages, setOpenMessages] = useState(false);
 
     // fetch all user ids in the database
     const fetchAllUsers = async () => {
@@ -71,6 +76,7 @@ function People() {
         console.log(data.message);
         if (data.likesEachOther) {
             setThereIsAMatch(true);
+            setLikedUsername(data.likedUsername);
         }
     }
 
@@ -110,17 +116,24 @@ function People() {
     }
 
     const openProfileDrawer = () => {
-        // when open profile button (🐳 button) is clicked
-        console.log('open profile drawer button clicked');
+        // when open profile button (MY PROFILE 🐳 button) is clicked
+        console.log('opening profile drawer');
 
         setOpenProfile(true);
+    }
+
+    const openMessagesDrawer = () => {
+        // when open profile button (MESSAGES 💌 button) is clicked
+        console.log('opening messages drawer');
+
+        setOpenMessages(true);
     }
 
     return (<>
         <Box sx={{display:'flex', justifyContent:'center', transform: "translate(0%, 20%)"}}>
             <h2>Find your true love 💕</h2>
 
-            <MatchModal open={thereIsAMatch} close={() => setThereIsAMatch(false)}/>
+            <MatchModal likedUser={likedUsername} open={thereIsAMatch} close={() => setThereIsAMatch(false)}/>
 
             {
                 allUsers.map((userId, index) => (
@@ -135,6 +148,10 @@ function People() {
 
             <Drawer open={openProfile} onClose={() => setOpenProfile(false)}>
                 <ProfileDrawer user={currentUser}/>
+            </Drawer>
+
+            <Drawer open={openMessages} onClose={() => setOpenMessages(false)} anchor="right" >
+                <MessagesDrawer user={currentUser} />
             </Drawer>
         </Box>
 
@@ -156,7 +173,7 @@ function People() {
                 sx={{
                     height:'50px', backgroundColor:'orange', 
                 }} 
-                disableElevation onClick={openProfileDrawer}>
+                disableElevation onClick={openMessagesDrawer}>
                 {`MESSAGES 💌`}
             </Button>
         </Stack>
