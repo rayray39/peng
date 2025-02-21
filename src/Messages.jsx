@@ -82,7 +82,7 @@ function Messages() {
         }
 
         console.log(data.message);
-        setDisplayMessages((prev) => [...prev, messageContent]);
+        setDisplayMessages((prev) => [...prev, {content: messageContent, sender: currentUser.username}]);
         setMessageContent('');
         document.getElementById('message-textfield')?.blur();   // clear the textfield after message sent
     }
@@ -102,19 +102,17 @@ function Messages() {
 
             <Stack sx={{height:'300px', overflow:'auto', marginBottom:'4px'}} spacing={1}>
                 {
-                    displayMessages ? 
                     displayMessages.map((message, index) => (
                         message.sender === currentUser.username ?
                             <MessageBubble message={message.content} alignment={'flex-end'} bgColor={'orange'} key={index} /> :
                             <MessageBubble message={message.content} alignment={'flex-start'} bgColor={'black'} key={index} />
-                    )) :
-                    null
+                    ))
                 }
 
                 <div ref={messagesEndRef} />
             </Stack>
 
-            <TextField id="message-textfield" variant="filled" value={messageContent} onChange={handleMessageContent} />
+            <TextField id="message-textfield" variant="filled" value={messageContent} onChange={handleMessageContent} autoFocus />
 
             <Button onClick={sendMessage} variant="outlined" disableElevation
                 sx={{
