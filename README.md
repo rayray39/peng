@@ -1,3 +1,39 @@
+# Peng: A no nonsense dating app for the serious
+
+## Contents
+- [Usage](#usage)
+- [Learning points](#learning-points)
+    - [Frontend](#frontend)
+    - [Backend](#backend)
+    - [Fullstack](#fullstack)
+    - [Others](#others)
+- [Guides](#guides)
+    - [User guide](#user-guide)
+    - [Dev guide](#dev-guide)
+
+## Usage
+
+
+## Learning Points
+This section covers the technical lessons learnt while building Peng.  
+
+### Frontend
+
+
+### Backend
+
+
+### Fullstack
+
+
+### Others
+
+## Guides
+
+### User guide
+
+### Dev guide
+
 # React + Vite
 
 This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
