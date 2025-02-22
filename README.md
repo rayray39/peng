@@ -20,7 +20,6 @@ The main features are:
 - [Learning points](#learning-points)
     - [Frontend](#frontend)
     - [Backend](#backend)
-    - [Fullstack](#fullstack)
     - [Others](#others)
 - [Guides](#guides)
     - [User guide](#user-guide)
