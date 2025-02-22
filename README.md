@@ -1,4 +1,19 @@
-# Peng: A no nonsense dating app for the serious
+# Peng: A no nonsense dating platform for the serious  
+<p align='center'>
+    <img src='./src/assets/peng_logo.jpg' width='75%'>
+</p>
+
+Peng was designed for people who are serious about making meaningful connections. With a streamlined user profile setup journey—including bio creation, hobby selection, and image uploads—Peng ensures users put their best foot forward. The platform features a familiar swipe mechanism to discover potential matches, and once a match is made, users can instantly chat to take things further. Built for simplicity and authenticity, Peng prioritizes quality over gimmicks, making dating simple and intentional.  
+
+The main features are:
+
+| Features             | Description |
+| -------------------- | ----------- |
+| Login/Create account | When a user logs in or when a new account is created, a JWT (JSON Web Token) is issued to authenticate the user and provide access to subsequent pages. This JWT is stored in the user's local storage for retrieval.     |
+| Fill in bio          | Users are to fill in a bio (i.e., a short description) that describes themselves.        |
+| Select hobbies       | Users are to select 3 hobbies, each hobby chip was designed based off Material UI's Chip component.        |
+| Upload images        | Users are to select 3 images from files and images are subsequently uploaded to Cloudinary for cloud storage.        |
+| Messaging            | Users can message liked users and the messages are dynamically updated and sent to the receipient immediately.        |
 
 ## Contents
 - [Usage](#usage)
@@ -12,7 +27,8 @@
     - [Dev guide](#dev-guide)
 
 ## Usage
-Visit the website [here]()
+Visit the website [here]()  
+**not deployed just yet, still finishing some tweaks...
 
 ## Learning Points
 This section covers the technical lessons learnt while building Peng.  
@@ -42,10 +58,12 @@ This section covers the technical lessons learnt while building Peng.
 - deployment using [vercel](https://vercel.com/)
 
 ## Guides
-
 ### User guide
-
+Click [here]() for the user guide  
+**not written yet, will be uploaded soon!
 ### Dev guide
+Click [here]() for the dev guide  
+**not written yet, will be uploaded soon!
 
 # React + Vite
 
