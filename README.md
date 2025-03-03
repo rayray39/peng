@@ -22,7 +22,6 @@ The main features are:
     - [Backend](#backend)
     - [Others](#others)
 - [Guides](#guides)
-    - [User guide](#user-guide)
     - [Dev guide](#dev-guide)
 
 ## Usage
@@ -57,9 +56,6 @@ This section covers the technical lessons learnt while building Peng.
 - deployment using [vercel](https://vercel.com/)
 
 ## Guides
-### User guide
-Click [here]() for the user guide  
-**not written yet, will be uploaded soon!
 ### Dev guide
 Click [here]() for the dev guide  
 **not written yet, will be uploaded soon!
