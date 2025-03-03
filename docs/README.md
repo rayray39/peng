@@ -3,7 +3,8 @@
 # Architecture
 ** will be included soon!!
 
-# Components
+# Components  
+
 | Component    | Description |
 | -------- | ------- |
 | WelcomePage  | Main entry point of the website. Has 2 buttons, ‘login’ and ‘create account’, which navigates the user to the Login and CreateAccount components respectively    |
